@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "php-ai/php-ml": "^0.4.1",
+    "bavix/flow-native": "^1.0",
     "bavix/foundation": "^1.0"
   },
   "autoload": {
