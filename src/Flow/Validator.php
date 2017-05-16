@@ -5,8 +5,21 @@ namespace Bavix\Flow;
 class Validator
 {
 
-    const T_EQUAL  = PHP_INT_MAX;
-    const T_FOR_IN = self::T_EQUAL - 1;
+    const T_EQUAL      = PHP_INT_MAX;
+    const T_FOR_IN     = self::T_EQUAL - 1;
+    const T_NULL       = self::T_FOR_IN - 1;
+    const T_BRACKET    = self::T_NULL - 1;
+    const T_ENDBRACKET = self::T_BRACKET - 1;
+    const T_ENDARRAY   = self::T_ENDBRACKET - 1;
+
+    protected static $types = [
+        '['    => \T_ARRAY,
+        ']'    => self::T_ENDARRAY,
+        '='    => self::T_EQUAL,
+        'null' => self::T_NULL,
+        '('    => self::T_BRACKET,
+        ')'    => self::T_ENDBRACKET,
+    ];
 
     /**
      * @param array|string $type
@@ -38,6 +51,16 @@ class Validator
         }
 
         return $_;
+    }
+
+    public static function getType($value, $default)
+    {
+        if (isset(static::$types[$value]))
+        {
+            return static::$types[$value];
+        }
+
+        return $default;
     }
 
     /**

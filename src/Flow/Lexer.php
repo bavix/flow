@@ -111,7 +111,7 @@ class Lexer
         $mixed    = [];
         $last     = null;
         $dot      = null;
-        $key      = '';
+        $code     = '';
         $print    = null;
 
         while (!$queue->isEmpty())
@@ -121,22 +121,23 @@ class Lexer
             $_type = Validator::getValue($read);
             $data  = $read[1] ?? $read;
 
+            if ($_type === \T_OPEN_TAG || $_type === \T_OPEN_TAG_WITH_ECHO || $_type === \T_CLOSE_TAG)
+            {
+                continue;
+            }
+
             if ($data === '=')
             {
-                $_type = Validator::get('T_EQUAL');
                 $print = false;
             }
 
-            if ($data === '[')
+            if ($_type === \T_STRING)
             {
-                $_type = \T_ARRAY;
-            }
+                $isVar = preg_match('~[a-z_]+[\w_]*~i', $data);
 
-            if ($_type === \T_STRING && preg_match('~[a-z_]+[\w_]*~i', $data))
-            {
-                $_type = \T_VARIABLE;
+                $_type = Validator::getType($data, $isVar ? \T_VARIABLE : \T_STRING);
 
-                if (!empty($mixed))
+                if ($isVar && !empty($mixed))
                 {
                     $mix = current($mixed);
 
@@ -147,7 +148,7 @@ class Lexer
                 }
             }
 
-            $key .= $data;
+            $code .= $data;
 
             if (($dot || $data === '.') && $anyType === \T_WHITESPACE)
             {
@@ -163,9 +164,9 @@ class Lexer
 
             $anyType = $_type;
 
-            if (!$type && $data === '{' && $key !== '{{')
+            if (!$type && $data === '{' && $code !== '{{')
             {
-                $key = $data;
+                $code = $data;
             }
 
             if ($data{0} === '\\')
@@ -205,19 +206,19 @@ class Lexer
 
                 if (empty($mixed))
                 {
-                    throw new Exceptions\Blank('Empty tokens `' . $key . '`');
+                    throw new Exceptions\Blank('Empty tokens `' . $code . '`');
                 }
 
                 $token    = current($mixed);
                 $name     = $token->name;
-                $fragment = \preg_replace('~[ \t\n\r\v]{2,}~', ' ', $key);
+                $fragment = \preg_replace('~[ \t\n\r\v]{2,}~', ' ', $code);
 
-                $storage[$type][$key] = [
+                $storage[$type][$code] = [
                     'type'     => $type,
                     'print'    => $print,
                     'escape'   => $this->escaping[$type],
                     'name'     => $name,
-                    'code'     => $key,
+                    'code'     => $code,
                     'fragment' => \trim(\mb_substr($fragment, 2, -2)),
                     'tokens'   => $mixed
                 ];
@@ -225,7 +226,7 @@ class Lexer
                 $mixed = [];
                 $type  = null;
                 $last  = null;
-                $key   = '';
+                $code  = '';
             }
             else if ($type && $end[$type] !== $data)
             {
@@ -298,13 +299,14 @@ class Lexer
         }
 
         // remove comments
-        $source = \preg_replace('~\{\*\X*?\*\}~', '', $source);
-        $source = \strtr($source, $this->phpTags); // remove php tags
+        $source  = \preg_replace('~\{(?<q>\*|#)\X*?(\k<q>)\}~', '', $source);
+        $source  = \strtr($source, $this->phpTags); // remove php tags
+        $lexCode = \preg_replace('~(["\'#]{1}|\/{2}|\/\*)~u', '?>$1<?php ', $source);
 
         // analysis tokens
         return $this->analysis(
             // source progress with helped tokenizer
-            \token_get_all('<?php' . PHP_EOL . $source)
+            \token_get_all('<?php' . PHP_EOL . $lexCode)
         );
     }
 
