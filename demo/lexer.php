@@ -17,10 +17,10 @@ $lexer = new \Bavix\Flow\Lexer();
 //$source = '{%for task in user.tasks()%}{{\'{{\'}} {%literal%}{!html!}{%endliteral%} {{ user.name() ?? \'help\' }} {%endfor%}';
 //$source = '{% foreach tasks as task %}{{ task }}{%endforeach%}';
 
-$source = '{% macro input( options ) %}
+$source = '{% helper input( options ) %}
     <label id=\'#-{{ crc32(options.name) }}\' >{{ options.label }}</label>
     <input type="{{ options.type }}" name="{{ options.name }}" value="{{ options.value }}" />
-{% endmacro %}
+{% endhelper %}
 ';
 
 foreach ($lexer->tokens($source) as $type => $types)
