@@ -168,6 +168,11 @@ class Lexer
                 $key = $data;
             }
 
+            if ($data{0} === '\\')
+            {
+                throw new \ParseError('namespace isn\'t resolved');
+            }
+
             $index = $lastChar . $data;
 
             if ((isset($open[$index]) && $type) || (isset($close[$index]) && !$type))
@@ -189,13 +194,13 @@ class Lexer
             {
                 if ($dot)
                 {
-                    throw new Exceptions\Runtime('Undefined dot `' . implode(' ', $mixed) . '`');
+                    throw new Exceptions\Runtime('Undefined dot `' . \implode(' ', $mixed) . '`');
                 }
 
                 if ($type !== $close[$lastChar . $data])
                 {
                     throw new Exceptions\Runtime(
-                        'Undefined syntax code `' . $begin[$type] . ' ' . implode(' ', $mixed) . $data . '`');
+                        'Undefined syntax code `' . $begin[$type] . ' ' . \implode(' ', $mixed) . $data . '`');
                 }
 
                 if (empty($mixed))
@@ -203,16 +208,17 @@ class Lexer
                     throw new Exceptions\Blank('Empty tokens `' . $key . '`');
                 }
 
-                $token = current($mixed);
-                $name  = $token->name;
+                $token    = current($mixed);
+                $name     = $token->name;
+                $fragment = \preg_replace('~[ \t\n\r\v]{2,}~', ' ', $key);
 
                 $storage[$type][$key] = [
                     'type'     => $type,
                     'print'    => $print,
                     'escape'   => $this->escaping[$type],
                     'name'     => $name,
-                    'fragment' => $key,
-                    'code'     => implode(' ', $mixed),
+                    'code'     => $key,
+                    'fragment' => \trim(\mb_substr($fragment, 2, -2)),
                     'tokens'   => $mixed
                 ];
 
