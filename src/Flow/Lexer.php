@@ -13,10 +13,29 @@ class Lexer
     const PRINTER  = 4;
     const LITERAL  = 8;
 
+    /**
+     * @var string
+     */
     protected $openLiteralRegExp  = "\{%[ \t\n\r \v]*literal[ \t\n\r \v]*%\}";
+
+    /**
+     * @var string
+     */
     protected $closeLiteralRegExp = "\{%[ \t\n\r \v]*endliteral[ \t\n\r \v]*%\}";
 
+    /**
+     * @var array
+     */
     protected $literals = [];
+
+    /**
+     * @var array
+     */
+    protected $escaping = [
+        self::RAW      => false,
+        self::OPERATOR => false,
+        self::PRINTER  => true,
+    ];
 
     /**
      * @var array
@@ -28,7 +47,23 @@ class Lexer
         '?>'    => '-->',
     ];
 
-    protected function tokens(array $tokens)
+    protected function last($last, $data, $equal = '.')
+    {
+        return
+            // last exists
+            $last &&
+
+            // if exists then type is string?
+            $last->type === \T_STRING &&
+
+            // if type is string then data is '('?
+            $data === $equal &&
+
+            // if true then token is variable ?
+            preg_match('~[a-z_]+~i', $last->token);
+    }
+
+    protected function analysis(array $tokens)
     {
         $queue = new Queue($tokens);
         $queue->pop(); // remove open <?php
@@ -61,52 +96,95 @@ class Lexer
             self::PRINTER  => [],
         ];
 
-        $literals   = [];
-        $lvlLiteral = 0;
-
+        $anyType  = null;
         $lastChar = null;
-        $start    = null;
+        $type     = null;
         $mixed    = [];
         $last     = null;
+        $dot      = null;
         $key      = '';
 
         while (!$queue->isEmpty())
         {
             $read = $queue->pop();
 
-            $type = is_array($read) ? $read[0] : \T_STRING;
-            $data = $read[1] ?? $read;
+            $_type = is_array($read) ? $read[0] : \T_STRING;
+            $data  = $read[1] ?? $read;
+
+            if ($data === '[')
+            {
+//                if ($queue->isEmpty())
+//                {
+//                    throw new Exceptions\Runtime('Queue is empty');
+//                }
+//
+//                $_level = 1;
+//                do
+//                {
+//                    $result = $queue->pop();
+//                    $result = $result[1] ?? $result;
+//
+//                    $data .= $result;
+//
+//                    switch ($result)
+//                    {
+//                        case '[': $_level++; break;
+//                        case ']': $_level--; break;
+//                    }
+//                }
+//                while (!$queue->isEmpty() && $_level);
+
+                $_type = \T_ARRAY;
+            }
 
             $key .= $data;
 
-            if ($type === \T_WHITESPACE)
+            if (($dot || $data === '.') && $anyType === \T_WHITESPACE)
+            {
+                throw new Exceptions\Runtime('Undefined dot `' . implode(' ', $mixed) . ' ' . $data . '`');
+            }
+
+            if ($_type === \T_WHITESPACE)
             {
                 $lastChar = $data;
+                $anyType  = $_type;
                 continue;
             }
 
-            if (!$start && $data === '{' && $key !== '{{')
+            $anyType = $_type;
+
+            if (!$type && $data === '{' && $key !== '{{')
             {
                 $key = $data;
             }
 
             $index = $lastChar . $data;
 
-            if ((isset($open[$index]) && $start) || (isset($close[$index]) && !$start))
+            if ((isset($open[$index]) && $type) || (isset($close[$index]) && !$type))
             {
                 throw new Exceptions\Logic('Syntax error `' . $lastChar . $data . '`');
             }
 
             if (isset($open[$index]))
             {
-                $start = $open[$lastChar . $data];
+                if ($dot)
+                {
+                    throw new Exceptions\Runtime('Undefined dot');
+                }
+
+                $type = $open[$lastChar . $data];
             }
             else if (isset($close[$index]))
             {
-                if ($start !== $close[$lastChar . $data])
+                if ($dot)
+                {
+                    throw new Exceptions\Runtime('Undefined dot `' . implode(' ', $mixed) . '`');
+                }
+
+                if ($type !== $close[$lastChar . $data])
                 {
                     throw new Exceptions\Runtime(
-                        'Undefined syntax code `' . $begin[$start] . ' ' . implode(' ', $mixed) . $data . '`');
+                        'Undefined syntax code `' . $begin[$type] . ' ' . implode(' ', $mixed) . $data . '`');
                 }
 
                 if (empty($mixed))
@@ -117,8 +195,9 @@ class Lexer
                 $token = current($mixed);
                 $name  = $token->name;
 
-                $storage[$start][$key] = [
-                    'type'   => $start,
+                $storage[$type][$key] = [
+                    'type'   => $type,
+                    'esc'    => $this->escaping[$type],
                     'name'   => $name,
                     'tpl'    => $key,
                     'code'   => implode(' ', $mixed),
@@ -126,35 +205,31 @@ class Lexer
                 ];
 
                 $mixed = [];
-                $start = null;
+                $type  = null;
                 $last  = null;
                 $key   = '';
             }
-            else if ($start && $end[$start] !== $data)
+            else if ($type && $end[$type] !== $data)
             {
-                if (
-                    // last exists
-                    $last &&
-
-                    // if exists then type is string?
-                    $last->type === \T_STRING &&
-
-                    // if type is string then data is '('?
-                    $data === '(' &&
-
-                    // if true then token is variable ?
-                    preg_match('~[a-z_]+~i', $last->token)
-                )
+                if ($this->last($last, $data, '('))
                 {
                     $last->type = \T_FUNCTION;
                 }
+                else if ($this->last($last, $data, '.') || $dot)
+                {
+                    $dot         = !$dot;
+                    $last->token .= $data;
 
-                $mixed[] = $last = new Token($data, $type);
+                    continue;
+                }
+
+                $mixed[] = $last = new Token($data, $_type);
             }
 
             $lastChar = $data;
         }
 
+        // set literal & cleanup literals
         $storage[self::LITERAL] = $this->literals;
         $this->literals         = [];
 
@@ -168,10 +243,13 @@ class Lexer
      */
     protected function literal(array $matches)
     {
-        $hash = '[!' . __FUNCTION__ . '_' . crc32($matches[1]) . '!]';
+        // hash from matches
+        $hash = '[!' . __FUNCTION__ . '::read(' . \crc32($matches[1]) . ')!]';
 
+        // save hash and value to literals array
         $this->literals[$hash] = $matches[1];
 
+        // return hash value for replace
         return $hash;
     }
 
@@ -180,30 +258,34 @@ class Lexer
      *
      * @return array
      */
-    public function parse(&$source)
+    public function tokens(&$source)
     {
+        // literal from source to array
         $source = \preg_replace_callback(
             "~{$this->openLiteralRegExp}(\X*?){$this->closeLiteralRegExp}~u",
             [$this, 'literal'],
             $source
         );
 
-        // check literal open
-        if (preg_match("~{$this->openLiteralRegExp}~u", $source))
+        // if check literal open then throw
+        if (\preg_match("~{$this->openLiteralRegExp}~u", $source))
         {
             throw new Exceptions\Logic('Literal isn\'t closed');
         }
 
-        // check literal close
-        if (preg_match("~{$this->closeLiteralRegExp}~u", $source))
+        // if check literal close then throw
+        if (\preg_match("~{$this->closeLiteralRegExp}~u", $source))
         {
             throw new Exceptions\Logic('Literal isn\'t open');
         }
 
+        // remove comments
         $source = \preg_replace('~\{\*\X*?\*\}~', '', $source);
-        $source = \strtr($source, $this->phpTags);
+        $source = \strtr($source, $this->phpTags); // remove php tags
 
-        return $this->tokens(
+        // analysis tokens
+        return $this->analysis(
+            // source progress with helped tokenizer
             \token_get_all('<?php' . PHP_EOL . $source)
         );
     }

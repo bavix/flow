@@ -1,0 +1,6 @@
+Lexer -- get (all?) tokens
+Validator -- validate tokens
+Parser -- make tree
+Normalizer -- normalize tree
+
+Expr -- no raw
