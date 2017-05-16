@@ -108,32 +108,16 @@ class Lexer
         {
             $read = $queue->pop();
 
-            $_type = is_array($read) ? $read[0] : \T_STRING;
+            $_type = Validator::getValue($read);
             $data  = $read[1] ?? $read;
+
+            if ($data === '=')
+            {
+                $_type = Validator::get('T_EQUAL');
+            }
 
             if ($data === '[')
             {
-//                if ($queue->isEmpty())
-//                {
-//                    throw new Exceptions\Runtime('Queue is empty');
-//                }
-//
-//                $_level = 1;
-//                do
-//                {
-//                    $result = $queue->pop();
-//                    $result = $result[1] ?? $result;
-//
-//                    $data .= $result;
-//
-//                    switch ($result)
-//                    {
-//                        case '[': $_level++; break;
-//                        case ']': $_level--; break;
-//                    }
-//                }
-//                while (!$queue->isEmpty() && $_level);
-
                 $_type = \T_ARRAY;
             }
 

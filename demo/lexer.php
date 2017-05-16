@@ -14,7 +14,7 @@ $lexer = new \Bavix\Flow\Lexer();
 
 //$source = '{{$a=trim($a)}}';
 //$source = '{% for task in tasks %}{{ task }}{%endfor%}';
-$source = '{%for task in user.tasks()%}{{\'{{\'}} {%literal%}{!html!}{%endliteral%} {%endfor%}';
+$source = '{%for task in user.tasks()%}{{\'{{\'}} {%literal%}{!html!}{%endliteral%} {{ a = [1, 2, 3] }} {%endfor%}';
 //$source = '{% foreach tasks as task %}{{ task }}{%endforeach%}';
 
 foreach ($lexer->tokens($source) as $type => $types)

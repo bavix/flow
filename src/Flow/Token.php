@@ -26,7 +26,7 @@ class Token
     {
         $this->data['token'] = $data;
         $this->data['type']  = $type;
-        $this->data['name']  = \token_name($type);
+        $this->data['name']  = Validator::get($type);
     }
 
     /**
@@ -55,12 +55,12 @@ class Token
     {
         if ($name === 'type')
         {
-            $this->data['name'] = \token_name($value);
+            $this->data['name'] = Validator::get($value);
         }
 
         if ($name === 'name')
         {
-            throw new Invalid('Undefined index `name`');
+            $this->data['type'] = Validator::get($value);
         }
 
         $this->data[$name] = $value;
