@@ -31,9 +31,18 @@ class Lexer
     /**
      * @var array
      */
-    protected $escaping = [
-        self::RAW      => false,
+    protected $prints = [
         self::OPERATOR => false,
+        self::RAW      => true,
+        self::PRINTER  => true,
+    ];
+
+    /**
+     * @var array
+     */
+    protected $escaping = [
+        self::OPERATOR => false,
+        self::RAW      => false,
         self::PRINTER  => true,
     ];
 
@@ -54,7 +63,7 @@ class Lexer
             $last &&
 
             // if exists then type is string?
-            $last->type === \T_STRING &&
+            in_array($last->type, [\T_STRING, \T_VARIABLE], true) &&
 
             // if type is string then data is '('?
             $data === $equal &&
@@ -103,6 +112,7 @@ class Lexer
         $last     = null;
         $dot      = null;
         $key      = '';
+        $print    = null;
 
         while (!$queue->isEmpty())
         {
@@ -114,11 +124,27 @@ class Lexer
             if ($data === '=')
             {
                 $_type = Validator::get('T_EQUAL');
+                $print = false;
             }
 
             if ($data === '[')
             {
                 $_type = \T_ARRAY;
+            }
+
+            if ($_type === \T_STRING && preg_match('~[a-z_]+[\w_]*~i', $data))
+            {
+                $_type = \T_VARIABLE;
+
+                if (!empty($mixed))
+                {
+                    $mix = current($mixed);
+
+                    if ($mix->type === \T_FOR && $data === 'in')
+                    {
+                        $_type = Validator::get('T_FOR_IN');
+                    }
+                }
             }
 
             $key .= $data;
@@ -156,7 +182,8 @@ class Lexer
                     throw new Exceptions\Runtime('Undefined dot');
                 }
 
-                $type = $open[$lastChar . $data];
+                $type  = $open[$lastChar . $data];
+                $print = $this->prints[$type];
             }
             else if (isset($close[$index]))
             {
@@ -180,12 +207,13 @@ class Lexer
                 $name  = $token->name;
 
                 $storage[$type][$key] = [
-                    'type'   => $type,
-                    'esc'    => $this->escaping[$type],
-                    'name'   => $name,
-                    'tpl'    => $key,
-                    'code'   => implode(' ', $mixed),
-                    'tokens' => $mixed
+                    'type'     => $type,
+                    'print'    => $print,
+                    'escape'   => $this->escaping[$type],
+                    'name'     => $name,
+                    'fragment' => $key,
+                    'code'     => implode(' ', $mixed),
+                    'tokens'   => $mixed
                 ];
 
                 $mixed = [];

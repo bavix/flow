@@ -5,7 +5,8 @@ namespace Bavix\Flow;
 class Validator
 {
 
-    const T_EQUAL = PHP_INT_MAX;
+    const T_EQUAL  = PHP_INT_MAX;
+    const T_FOR_IN = self::T_EQUAL - 1;
 
     /**
      * @param array|string $type
