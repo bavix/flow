@@ -150,7 +150,7 @@ class Lexer
 
             $code .= $data;
 
-            if (($dot || $data === '.') && $anyType === \T_WHITESPACE)
+            if ($dot && $anyType === \T_WHITESPACE)
             {
                 throw new Exceptions\Runtime('Undefined dot `' . implode(' ', $mixed) . ' ' . $data . '`');
             }

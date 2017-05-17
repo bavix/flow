@@ -21,6 +21,10 @@ $source = '{% helper input( options ) %}
     <label id=\'#-{{ id(options.name) }}\' >{{ options.label }}</label>
     <input type="{{ options.type }}" name="{{ options.name }}" value="{{ options.value }}" />
 {% endhelper %}
+
+{%for task in user.tasks()%}
+    {{ .name~\' \'~.lastName  }}
+{%endfor%}
 ';
 
 foreach ($lexer->tokens($source) as $type => $types)

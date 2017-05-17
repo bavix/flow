@@ -15,6 +15,10 @@ class Validator
     const T_HELPER    = self::T_ENDARRAY - 1;
     const T_ENDHELPER = self::T_HELPER - 1;
 
+    const T_DOT    = self::T_ENDHELPER - 1;
+
+    const T_CONCAT = self::T_DOT - 1;
+
     protected static $globalTypes = [
         '['    => \T_ARRAY,
         ']'    => self::T_ENDARRAY,
@@ -22,6 +26,8 @@ class Validator
         'null' => self::T_NULL,
         '('    => self::T_BRACKET,
         ')'    => self::T_ENDBRACKET,
+        '~'    => self::T_CONCAT,
+        '.'    => self::T_DOT,
     ];
 
     protected static $lexerTypes = [
@@ -65,9 +71,12 @@ class Validator
 
     public static function getType($value, $default, $lexerType)
     {
-        if ($lexerType && isset(static::$lexerTypes[$lexerType][$value]))
+        if ($lexerType)
         {
-            return static::$lexerTypes[$lexerType][$value];
+            if (isset(static::$lexerTypes[$lexerType][$value]))
+            {
+                return static::$lexerTypes[$lexerType][$value];
+            }
         }
 
         if (isset(static::$globalTypes[$value]))
@@ -87,31 +96,31 @@ class Validator
     {
         if (\is_string($type))
         {
-            if (\defined($type))
-            {
-                return \constant($type);
-            }
-
             if (\defined(static::class . '::' . $type))
             {
                 return \constant(static::class . '::' . $type);
             }
 
+            if (\defined($type))
+            {
+                return \constant($type);
+            }
+
             return \T_STRING;
+        }
+
+        foreach (static::constants() as $name => $value)
+        {
+            if ($value === $type)
+            {
+                return $name;
+            }
         }
 
         $token = \token_name($type);
 
         if ($token === 'UNKNOWN')
         {
-            foreach (static::constants() as $name => $value)
-            {
-                if ($value === $type)
-                {
-                    return $name;
-                }
-            }
-
             return 'T_STRING';
         }
 
