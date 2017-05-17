@@ -105,6 +105,7 @@ class Lexer
             self::PRINTER  => [],
         ];
 
+        $iterate = 0;
         $anyType  = null;
         $lastChar = null;
         $type     = null;
@@ -131,7 +132,7 @@ class Lexer
                 $print = false;
             }
 
-            if ($_type === \T_INLINE_HTML)
+            if ($type && $_type === \T_INLINE_HTML)
             {
                 $lvl = 1;
                 $rEnd = $data;
@@ -277,6 +278,7 @@ class Lexer
             }
 
             $lastChar = $data;
+            $iterate++;
         }
 
         // set literal & cleanup literals
@@ -330,9 +332,9 @@ class Lexer
         }
 
         // remove comments
-        $source  = \preg_replace('~\{(?<q>\*|#)\X*?(\k<q>)\}~', '', $source);
+        $source  = \preg_replace('~\{(?<q>\*)\X*?(\k<q>)\}~', '', $source);
         $source  = \strtr($source, $this->phpTags); // remove php tags
-        $lexCode = \preg_replace('~(["\'#]{1}|\/{2}|\/\*)~u', '?>$1<?php ', $source);
+        $lexCode = \preg_replace('~("|\'|#|\/{2}|\/\*)~u', '?>$1<?php ', $source);
 
         // analysis tokens
         return $this->analysis(

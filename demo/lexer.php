@@ -19,7 +19,7 @@ $lexer = new \Bavix\Flow\Lexer();
 
 $source = '{% helper input( options ) %}
     <label id=\'#-{{ id(options.name) }}\' >{{ options.label }}</label>
-    <input type="{{ options.type }}" name="{{ options.name }}" value="{{ options.value }}" />
+    <input type="{{ .for }}" name="{{ options.name }}" value="{{ options.value }}" />
 {% endhelper %}
 
 {%for task in user.tasks()%}
