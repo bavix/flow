@@ -127,11 +127,6 @@ class Lexer
                 continue;
             }
 
-            if ($data === '=')
-            {
-                $print = false;
-            }
-
             if ($type && $_type === \T_INLINE_HTML)
             {
                 $lvl = 1;
@@ -184,6 +179,23 @@ class Lexer
                     }
                 }
             }
+
+            // $i++, --$i, $i += 1, $i.=1...
+            $print = $print && !in_array($_type, [
+                \T_INC,
+                \T_DEC,
+                \T_PLUS_EQUAL,
+                \T_MINUS_EQUAL,
+                \T_MUL_EQUAL,
+                \T_DIV_EQUAL,
+                \T_CONCAT_EQUAL,
+                \T_SR_EQUAL,
+                \T_SL_EQUAL,
+                \T_XOR_EQUAL,
+                \T_OR_EQUAL,
+                \T_AND_EQUAL,
+                \T_MOD_EQUAL,
+            ], true);
 
             $code .= $data;
 

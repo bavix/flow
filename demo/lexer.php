@@ -30,6 +30,13 @@ $source = '{% helper input( options ) %}
     {% for i in 1 ... 20 %}
         {% if i % 2 %}
             {{ i++ }}
+            {{ ++i }}
+            {{ i-- }}
+            {{ --i }}
+            {{ i+=1 }}
+            {{ i-=1 }}
+            {{ i*=1 }}
+            {{ i/=1 }}
         {% endif %}
     {% endfor %}
 </select>
