@@ -182,19 +182,19 @@ class Lexer
 
             // $i++, --$i, $i += 1, $i.=1...
             $print = $print && !in_array($_type, [
-                \T_INC,
-                \T_DEC,
-                \T_PLUS_EQUAL,
-                \T_MINUS_EQUAL,
-                \T_MUL_EQUAL,
-                \T_DIV_EQUAL,
-                \T_CONCAT_EQUAL,
-                \T_SR_EQUAL,
-                \T_SL_EQUAL,
-                \T_XOR_EQUAL,
-                \T_OR_EQUAL,
-                \T_AND_EQUAL,
-                \T_MOD_EQUAL,
+                \T_INC, // i++, ++i
+                \T_DEC, // i--, --i
+                \T_PLUS_EQUAL, // i+=1
+                \T_MINUS_EQUAL, // i-=1
+                \T_MUL_EQUAL, // i*=1
+                \T_DIV_EQUAL, // i/=1
+                \T_CONCAT_EQUAL, // i.=1
+                \T_SR_EQUAL, // i >>= 1
+                \T_SL_EQUAL, // i <<= 1
+                \T_XOR_EQUAL, // i^=1
+                \T_OR_EQUAL, // i|=1
+                \T_AND_EQUAL, // i&=1
+                \T_MOD_EQUAL, // i%=1
             ], true);
 
             $code .= $data;

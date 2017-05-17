@@ -37,6 +37,8 @@ $source = '{% helper input( options ) %}
             {{ i-=1 }}
             {{ i*=1 }}
             {{ i/=1 }}
+            {{ i>>=1 }}
+            {{ i<<=1 }}
         {% endif %}
     {% endfor %}
 </select>
