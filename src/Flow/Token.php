@@ -2,19 +2,13 @@
 
 namespace Bavix\Flow;
 
-use Bavix\Exceptions\Invalid;
-
 class Token
 {
 
     /**
      * @var array
      */
-    protected $data = [
-        'type'  => null,
-        'token' => null,
-        'name'  => null
-    ];
+    protected $data = [];
 
     /**
      * Token constructor.

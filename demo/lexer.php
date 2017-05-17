@@ -23,8 +23,16 @@ $source = '{% helper input( options ) %}
 {% endhelper %}
 
 {%for task in user.tasks()%}
-    {{ .name ~ \' \\\' \\\' \' ~ .lastName  }}
+    {{ .name ~ \' \\\' \\\' \' ~ @.lastName  }}
 {%endfor%}
+
+<select>
+    {% for i in 1 ... 20 %}
+        {% if i % 2 %}
+            {{ i++ }}
+        {% endif %}
+    {% endfor %}
+</select>
 ';
 
 foreach ($lexer->tokens($source) as $type => $types)

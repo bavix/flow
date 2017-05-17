@@ -15,9 +15,11 @@ class Validator
     const T_HELPER    = self::T_ENDARRAY - 1;
     const T_ENDHELPER = self::T_HELPER - 1;
 
-    const T_DOT    = self::T_ENDHELPER - 1;
+    const T_DOT = self::T_ENDHELPER - 1;
+    const T_AT  = self::T_DOT - 1;
 
-    const T_CONCAT = self::T_DOT - 1;
+    const T_CONCAT = self::T_AT - 1;
+    const T_COMMA = self::T_CONCAT- 1;
 
     protected static $globalTypes = [
         '['    => \T_ARRAY,
@@ -27,7 +29,9 @@ class Validator
         '('    => self::T_BRACKET,
         ')'    => self::T_ENDBRACKET,
         '~'    => self::T_CONCAT,
+        ','    => self::T_COMMA,
         '.'    => self::T_DOT,
+        '@'    => self::T_AT
     ];
 
     protected static $lexerTypes = [
