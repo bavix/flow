@@ -15,7 +15,7 @@ class Validator
     const T_HELPER    = self::T_ENDARRAY - 1;
     const T_ENDHELPER = self::T_HELPER - 1;
 
-    protected static $types = [
+    protected static $globalTypes = [
         '['    => \T_ARRAY,
         ']'    => self::T_ENDARRAY,
         '='    => self::T_EQUAL,
@@ -70,9 +70,9 @@ class Validator
             return static::$lexerTypes[$lexerType][$value];
         }
 
-        if (isset(static::$types[$value]))
+        if (isset(static::$globalTypes[$value]))
         {
-            return static::$types[$value];
+            return static::$globalTypes[$value];
         }
 
         return $default;
