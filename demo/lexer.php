@@ -18,7 +18,7 @@ $lexer = new \Bavix\Flow\Lexer();
 //$source = '{% foreach tasks as task %}{{ task }}{%endforeach%}';
 
 $source = '{% helper input( options ) %}
-    <label id=\'#-{{ crc32(options.name) }}\' >{{ options.label }}</label>
+    <label id=\'#-{{ id(options.name) }}\' >{{ options.label }}</label>
     <input type="{{ options.type }}" name="{{ options.name }}" value="{{ options.value }}" />
 {% endhelper %}
 ';

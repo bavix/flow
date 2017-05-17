@@ -135,7 +135,7 @@ class Lexer
             {
                 $isVar = preg_match('~[a-z_]+[\w_]*~i', $data);
 
-                $_type = Validator::getType($data, $isVar ? \T_VARIABLE : \T_STRING);
+                $_type = Validator::getType($data, $isVar ? \T_VARIABLE : \T_STRING, $type);
 
                 if ($isVar && !empty($mixed))
                 {

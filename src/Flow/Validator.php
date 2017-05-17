@@ -12,6 +12,9 @@ class Validator
     const T_ENDBRACKET = self::T_BRACKET - 1;
     const T_ENDARRAY   = self::T_ENDBRACKET - 1;
 
+    const T_HELPER    = self::T_ENDARRAY - 1;
+    const T_ENDHELPER = self::T_HELPER - 1;
+
     protected static $types = [
         '['    => \T_ARRAY,
         ']'    => self::T_ENDARRAY,
@@ -19,6 +22,13 @@ class Validator
         'null' => self::T_NULL,
         '('    => self::T_BRACKET,
         ')'    => self::T_ENDBRACKET,
+    ];
+
+    protected static $lexerTypes = [
+        Lexer::OPERATOR => [
+            'helper'    => self::T_HELPER,
+            'endhelper' => self::T_ENDHELPER,
+        ],
     ];
 
     /**
@@ -53,8 +63,13 @@ class Validator
         return $_;
     }
 
-    public static function getType($value, $default)
+    public static function getType($value, $default, $lexerType)
     {
+        if ($lexerType && isset(static::$lexerTypes[$lexerType][$value]))
+        {
+            return static::$lexerTypes[$lexerType][$value];
+        }
+
         if (isset(static::$types[$value]))
         {
             return static::$types[$value];
