@@ -23,7 +23,7 @@ $source = '{% helper input( options ) %}
 {% endhelper %}
 
 {%for task in user.tasks()%}
-    {{ .name~\' \'~.lastName  }}
+    {{ .name ~ \' \\\' \\\' \' ~ .lastName  }}
 {%endfor%}
 ';
 

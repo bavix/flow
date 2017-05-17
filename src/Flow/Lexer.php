@@ -131,6 +131,42 @@ class Lexer
                 $print = false;
             }
 
+            if ($_type === \T_INLINE_HTML)
+            {
+                $lvl = 1;
+                $rEnd = $data;
+
+                do {
+                    $read = $queue->pop();
+
+                    $_type = Validator::getValue($read);
+                    $_data  = $read[1] ?? $read;
+
+                    if ($_type === \T_OPEN_TAG || $_type === \T_OPEN_TAG_WITH_ECHO || $_type === \T_CLOSE_TAG)
+                    {
+                        continue;
+                    }
+
+                    if ($_type === \T_NS_SEPARATOR)
+                    {
+                        $lvl++;
+                    }
+
+                    if ($_data === $rEnd)
+                    {
+                        $lvl--;
+                    }
+
+                    $data .= $_data;
+
+                    if ($queue->isEmpty())
+                    {
+                        throw new \ParseError('Error code `' . $code . $data . '`');
+                    }
+
+                } while ($lvl);
+            }
+
             if ($_type === \T_STRING)
             {
                 $isVar = preg_match('~[a-z_]+[\w_]*~i', $data);
@@ -167,11 +203,6 @@ class Lexer
             if (!$type && $data === '{' && $code !== '{{')
             {
                 $code = $data;
-            }
-
-            if ($data{0} === '\\')
-            {
-                throw new \ParseError('namespace isn\'t resolved');
             }
 
             $index = $lastChar . $data;
