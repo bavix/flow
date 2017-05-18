@@ -2,8 +2,12 @@
 
 namespace Bavix\Flow;
 
-class Token
+use Bavix\Iterator\Traits\JsonSerializable;
+
+class Token implements \JsonSerializable
 {
+
+    use JsonSerializable;
 
     /**
      * @var array

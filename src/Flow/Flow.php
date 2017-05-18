@@ -10,7 +10,7 @@ class Flow
     /**
      * @var string
      */
-    protected $ext = '.flow';
+    protected $ext = 'flow';
 
     /**
      * @var Lexer
@@ -35,11 +35,16 @@ class Flow
 
     /**
      * @param string $view
+     *
+     * @return string
      */
     public function compile($view)
     {
         $path = $this->native->path($view . '.' . $this->ext);
+        $tpl = file_get_contents($path);
+
         // todo
+        return $this->lexer->tokens($tpl);
     }
 
 }

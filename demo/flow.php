@@ -1,0 +1,13 @@
+<?php
+
+include_once dirname(__DIR__) . '/vendor/autoload.php';
+
+$helper = new \Bavix\FlowNative\Helper();
+$native = new \Bavix\FlowNative\FlowNative($helper);
+$flow  = new \Bavix\Flow\Flow($native);
+
+$native->addFolder('app', __DIR__ . '/app');
+
+echo \Bavix\Helpers\JSON::encode(
+    $flow->compile('app:layout')
+);
