@@ -4,3 +4,21 @@ Parser -- make tree
 Normalizer -- normalize tree
 
 Expr -- no raw
+
+simple render
+  - raw query
+    - bavix.lexer
+    - bavix.filter
+    - bavix.to_raw
+    - bavix.l1
+    - bavix.mm
+    - bavix.l2
+    - bavix.l3
+  - filter lexer properties
+  - props - options
+  - props to validator
+  - [parser] + [validator]
+  - normalizer props
+  - render (flow native)
+  
+  - display on context
