@@ -5,7 +5,7 @@ namespace Bavix\Flow;
 class Validator
 {
 
-    const T_EQUAL      = PHP_INT_MAX;
+    const T_EQUAL      = 100000;
     const T_FOR_IN     = self::T_EQUAL - 1;
     const T_NULL       = self::T_FOR_IN - 1;
     const T_BRACKET    = self::T_NULL - 1;
@@ -15,7 +15,10 @@ class Validator
     const T_HELPER    = self::T_ENDARRAY - 1;
     const T_ENDHELPER = self::T_HELPER - 1;
 
-    const T_DOT = self::T_ENDHELPER - 1;
+    const T_WITH    = self::T_ENDHELPER - 1;
+    const T_ENDWITH = self::T_WITH - 1;
+
+    const T_DOT = self::T_WITH - 1;
     const T_AT  = self::T_DOT - 1;
 
     const T_CONCAT = self::T_AT - 1;
@@ -38,6 +41,9 @@ class Validator
         Lexer::OPERATOR => [
             'helper'    => self::T_HELPER,
             'endhelper' => self::T_ENDHELPER,
+
+            'with'    => self::T_WITH,
+            'endwith' => self::T_ENDWITH,
         ],
     ];
 

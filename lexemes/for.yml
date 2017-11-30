@@ -1,0 +1,12 @@
+properties:
+  rows:
+    types:
+      - variable
+      - callable
+      - array
+      - ternary
+
+syntax:
+  - '{{ row }} in {{ rows }}'
+  - '{{ rows }} as {{ row }}'
+  - '{{ rows }} as {{ key }} => {{ row }}'

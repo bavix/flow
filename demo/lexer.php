@@ -17,13 +17,27 @@ $lexer = new \Bavix\Flow\Lexer();
 //$source = '{%for task in user.tasks()%}{{\'{{\'}} {%literal%}{!html!}{%endliteral%} {{ user.name() ?? \'help\' }} {%endfor%}';
 //$source = '{% foreach tasks as task %}{{ task }}{%endforeach%}';
 
-$source = '{% helper input( options ) %}
-    <label id=\'#-{{ id(options.name) }}\' >{{ options.label }}</label>
+$source = '{% helper input( options ) %}{% with options %}
+    <label id=\'#-{{ id(.name) }}\' >{{ .label }}</label>
     <input type="{{ .for }}" name="{{ options.name }}" value="{{ options.value }}" />
-{% endhelper %}
+{% endwith %}{% endhelper %}
+
+{% with user %}
+
+{{
+.name ~ .test ~
+
+.obj ~ obj(.obj)
+
+}}
+
+{% endwith %}
 
 {%for task in user.tasks()%}
-    {{ .name ~ \' \\\' \\\' \' ~ @.lastName  }}
+    {{ @.iteration }}
+    {{ @.index }}
+    {{ @.key }}
+    {{ .name ~ \' \\\' \\\' \' ~ .lastName  }}
 {%endfor%}
 
 <select>
@@ -42,13 +56,16 @@ $source = '{% helper input( options ) %}
         {% endif %}
     {% endfor %}
 </select>
+
 ';
+
+$source .= '{%literal%}' . $source . '{%endliteral%} {% open %}123123{% endopen %}';
 
 foreach ($lexer->tokens($source) as $type => $types)
 {
     if ($type === \Bavix\Flow\Lexer::LITERAL)
     {
-        var_dump($types);
+        var_dump('literal', $types);
         continue;
     }
 
@@ -58,6 +75,6 @@ foreach ($lexer->tokens($source) as $type => $types)
     }
 }
 
-var_dump($source);
+//var_dump($source);
 
 //layout.flow

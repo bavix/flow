@@ -8,6 +8,7 @@ $flow  = new \Bavix\Flow\Flow($native);
 
 $native->addFolder('app', __DIR__ . '/app');
 
-echo \Bavix\Helpers\JSON::encode(
+//echo \Bavix\Helpers\JSON::encode(
+var_dump(
     $flow->compile('app:layout')
 );

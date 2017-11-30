@@ -11,6 +11,9 @@
     {{ a.b }}
 {% endif %}
 
+{% for (a             ? [1,2,3,4] : [4]) as item %}
+{%endfor                     %}
+
 {% if a.b = c.d %}
     {{ c.d }}
 {% endif %}

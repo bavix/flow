@@ -344,7 +344,7 @@ class Lexer
         }
 
         // remove comments
-        $source  = \preg_replace('~\{(?<q>\*)\X*?(\k<q>)\}~', '', $source);
+        $source  = \preg_replace('~\{(?<q>\*)\X*?(\k<q>)\}~u', '', $source);
         $source  = \strtr($source, $this->phpTags); // remove php tags
         $lexCode = \preg_replace('~("|\'|#|\/{2}|\/\*)~u', '?>$1<?php ', $source);
 

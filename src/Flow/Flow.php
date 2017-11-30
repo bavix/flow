@@ -10,7 +10,7 @@ class Flow
     /**
      * @var string
      */
-    protected $ext = 'flow';
+    protected $ext = 'bxf';
 
     /**
      * @var Lexer
