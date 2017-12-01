@@ -2,6 +2,7 @@
 
 namespace Bavix\Flow;
 
+use Bavix\Helpers\Arr;
 use Bavix\Lexer\Lexer;
 use Bavix\FlowNative\FlowNative;
 use Bavix\Lexer\Token;
@@ -61,6 +62,13 @@ class Flow
         $this->lexem  = new Lexem();
     }
 
+    protected function fragment(array $tokens)
+    {
+        return implode(' ', Arr::map($tokens, function (Token $token) {
+            return $token->token;
+        }));
+    }
+
     /**
      * @param string $view
      *
@@ -84,19 +92,29 @@ class Flow
              */
             $_tokens = $operator['tokens'];
 
+            // fragment for regExp
+            $fragment = $this->fragment($_tokens);
+
             /**
              * @var $_operator Token
              */
             $_operator = array_shift($_tokens);
             $lexemes = $this->lexem->data($_operator->token);
 
-            if (true === $lexemes)
+            if (true !== $lexemes)
             {
-                var_dump($lexemes);
+                foreach ($lexemes as $lexeme)
+                {
+                    var_dump($fragment);
+                    if (preg_match($lexeme['regexp'], $fragment))
+                    {
+                        var_dump($operator);
+                    }
+                }
             }
 
 //            $this->lexem->data($operator)
-            var_dump($operator);
+//            var_dump($operator);
         }
 
         die;
