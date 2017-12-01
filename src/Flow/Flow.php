@@ -105,10 +105,10 @@ class Flow
             {
                 foreach ($lexemes as $lexeme)
                 {
-                    var_dump($fragment);
                     if (preg_match($lexeme['regexp'], $fragment))
                     {
                         var_dump($operator);
+                        break;
                     }
                 }
             }
