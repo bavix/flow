@@ -10,7 +10,7 @@
   ],
   "require": {
     "bavix/flow-native": "^1.0",
-    "bavix/foundation": "^1.0"
+    "bavix/lexer": "^1.0"
   },
   "require-dev": {
     "matthiasmullie/minify": "^1.3",

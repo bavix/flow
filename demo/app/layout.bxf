@@ -7,11 +7,11 @@
     {% help %}
 {% endliteral %}
 
-{% if a.b = c.d %}
+{% if a.b === c.d %}
     {{ a.b }}
 {% endif %}
 
-{% for (a             ? [1,2,3,4] : [4]) as item %}
+{% for (a             ? [1,2,3,4] : [4]) as key=>item %}
 {%endfor                     %}
 
 {% if a.b = c.d %}

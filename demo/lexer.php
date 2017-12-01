@@ -2,7 +2,40 @@
 
 include_once dirname(__DIR__) . '/vendor/autoload.php';
 
-$lexer = new \Bavix\Flow\Lexer();
+//$obj = (object)[
+//    'hello' => (object)[
+//        'world' => [
+//            'w' => 20,
+//            'h' => 20
+//        ]
+//    ]
+//];
+//
+//function &row($obj, $path)
+//{
+//    $keys = explode('.', $path);
+//    $row = &$obj;
+//
+//    foreach ($keys as $key)
+//    {
+//        if (\is_object($row)) {
+//            $row = &$row->$key;
+//            continue;
+//        }
+//
+//        $row = &$row[$key];
+//    }
+//
+//    return $row;
+//}
+//
+//$row = &row($obj, 'hello.world.123');
+//$row = 123123123;
+//
+//var_dump($obj);
+//die;
+
+$lexer = new \Bavix\Lexer\Lexer();
 
 //var_dump($lexer->tokens('Hello, {{ name }}!'));
 //var_dump($lexer->tokens('Hello, {{ &= low( name ) }}!'));
@@ -17,19 +50,24 @@ $lexer = new \Bavix\Flow\Lexer();
 //$source = '{%for task in user.tasks()%}{{\'{{\'}} {%literal%}{!html!}{%endliteral%} {{ user.name() ?? \'help\' }} {%endfor%}';
 //$source = '{% foreach tasks as task %}{{ task }}{%endforeach%}';
 
-$source = '{% helper input( options ) %}{% with options %}
+$source = '
+
+{% set obj.true hello.world().property %}
+
+{% helper input( options ) %}{% with options %}
     <label id=\'#-{{ id(.name) }}\' >{{ .label }}</label>
     <input type="{{ .for }}" name="{{ options.name }}" value="{{ options.value }}" />
 {% endwith %}{% endhelper %}
 
 {% with user %}
 
-{{
-.name ~ .test ~
-
-.obj ~ obj(.obj)
-
-}}
+    {{
+        .name ~ 
+        .test ~
+        .obj ~ 
+        obj(.obj
+        )
+    }}
 
 {% endwith %}
 
@@ -43,27 +81,29 @@ $source = '{% helper input( options ) %}{% with options %}
 <select>
     {% for i in 1 ... 20 %}
         {% if i % 2 %}
-            {{ i++ }}
-            {{ ++i }}
-            {{ i-- }}
-            {{ --i }}
-            {{ i+=1 }}
-            {{ i-=1 }}
-            {{ i*=1 }}
-            {{ i/=1 }}
-            {{ i>>=1 }}
-            {{ i<<=1 }}
+            {% set i++ %}
+            {% set ++i %}
+            {% set i-- %}
+            {% set --i %}
+            {% set i+=1 %}
+            {% set i-=1 %}
+            {% set i*=1 %}
+            {% set i/=1 %}
+            {% set i>>=1 %}
+            {% set i<<=1 %}
+            {% set a.b.c = \'hello world\' %}
         {% endif %}
     {% endfor %}
 </select>
 
 ';
 
-$source .= '{%literal%}' . $source . '{%endliteral%} {% open %}123123{% endopen %}';
+$source .= '{%literal%}' . $source . '{%endliteral%} {% open %}123123';
+$source =  ' {%literal%}{%with types%}{{.title}}{%set a=\'111\'%}{%endwith%}{%endliteral%}' . $source;
 
 foreach ($lexer->tokens($source) as $type => $types)
 {
-    if ($type === \Bavix\Flow\Lexer::LITERAL)
+    if ($type === \Bavix\Lexer\Lexer::LITERAL)
     {
         var_dump('literal', $types);
         continue;
