@@ -2,13 +2,24 @@
 
 include_once dirname(__DIR__) . '/vendor/autoload.php';
 
-$lxm = new \Bavix\Flow\Lexem();
+$helper = new \Bavix\FlowNative\Helper();
+$native = new \Bavix\FlowNative\FlowNative($helper);
+$flow  = new \Bavix\Flow\Flow($native);
 
-foreach ($lxm->data('for') as $data)
-{
-//    var_dump($regex);
-    if (preg_match($data['regexp'], 'for i in 1 ... 20', $outs))
-    {
-        var_dump($data, $outs, $lxm->closed('for'));
-    }
-}
+$native->addFolder('app', __DIR__ . '/app');
+
+$lxm = new \Bavix\Flow\Lexem($flow);
+
+//$data = $lxm->apply('for', 'for users as key => user');
+$data = $lxm->apply('for', 'for (key, user) in users');
+
+$rows = $data['rows'];
+$row = $data['row'];
+$key = $data['key'] ?? '$' . \Bavix\Helpers\Str::random();
+
+echo <<<html
+foreach ($rows as $key => $row):
+    // ...foreach...
+endforeach;
+html;
+

@@ -8,13 +8,4 @@ $flow  = new \Bavix\Flow\Flow($native);
 
 $native->addFolder('app', __DIR__ . '/app');
 
-foreach ($flow->compile('app:layout') as $data)
-{
-    foreach ($data as $datum)
-    {
-        //echo \Bavix\Helpers\JSON::encode(
-        var_dump(
-            $datum
-        );
-    }
-}
+echo $flow->compile('app:layout');

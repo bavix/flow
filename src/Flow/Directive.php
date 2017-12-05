@@ -1,8 +1,8 @@
 <?php
 
-namespace Flow;
+namespace Bavix\Flow;
 
-use Bavix\Lexer\Token;
+use Bavix\Helpers\Str;
 
 abstract class Directive
 {
@@ -13,18 +13,25 @@ abstract class Directive
     protected $data;
 
     /**
+     * @var array
+     */
+    protected $operator;
+
+    /**
      * Directive constructor.
      *
      * @param array $data
+     * @param array $operator
      */
-    public function __construct(array $data)
+    public function __construct(array $data, array $operator)
     {
-        $this->data = $data;
+        $this->data     = $data;
+        $this->operator = $operator;
     }
 
-    public function variable(Token $token)
+    protected function randVariable(): string
     {
-
+        return '$' . Str::random(12);
     }
 
     /**

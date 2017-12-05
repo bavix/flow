@@ -1,23 +1,25 @@
-{{ help }}
 {{ help}}
 {! help !}
-{% help %}
 
 {% literal %}
-    {% help %}
+    {! help !}
 {% endliteral %}
 
 {% if a.b === c.d %}
-    {{ a.b }}
+    {{ route ('hello', [1,2,3]).name }} {{ a.b ~ a['b'].c }}
+{% elseif a.b === c.a %}
+{% else %}
 {% endif %}
 
-{% for (a             ? [1,2,3,4] : [4]) as key=>item %}
-{%endfor                     %}
+{% for (a             ? [1,2,3,4] : [4])as key=>item %}
+{% endfor %}
 
+{% for (key,item) in (a             ? [1,2,3,4] : [4]) %}
+{% endfor %}
 
 {% for user in users %}
-{%endfor                     %}
+{% endfor %}
 
-{% if a.b = c.d %}
+{% if a.b === c.d %}
     {{ c.d }}
 {% endif %}

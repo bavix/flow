@@ -7,9 +7,9 @@ properties:
       - callable
       - array
       - ternary
-      - range
 
 syntax:
   - '{{ row }} in {{ rows }}'
   - '{{ rows }} as {{ row }}'
   - '{{ rows }} as {{ key }} => {{ row }}'
+  - '\({{ key }}, {{ row }}\) in {{ rows }}'

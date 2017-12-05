@@ -1,36 +1,33 @@
 <?php
 
-namespace Flow\Directives;
+namespace Bavix\Flow\Directives;
 
-use Flow\Directive;
+use Bavix\Flow\Directive;
 
 class ForDirective extends Directive
 {
 
-    public function rows()
-    {
-        // get rows
-    }
-
-    public function key()
-    {
-        // get key
-    }
-
-    public function row()
-    {
-        // get row
-    }
-
     public function render(): string
     {
-        return 'if (!empty(' . $this->rows() . ')) :' .
-            'foreach (' . $this->rows() . ' as ' . $this->key() . ' => ' . $this->row() . ') :';
+        $init = '';
+        $rows = $this->data['rows']['code'];
+
+        if (\count($this->data['rows']['lexer']['tokens']) > 1)
+        {
+            $rows = $this->randVariable();
+            $init = $rows . '=' . $this->data['rows']['code'] . ';';
+        }
+
+        $key = $this->data['key']['code'] ?? $this->randVariable();
+        $row = $this->data['row']['code'];
+
+        return '<?php ' . $init . 'if (!empty(' . $rows . ')):' .
+            'foreach (' . $rows . ' as ' . $key . ' => ' . $row . '):?>';
     }
 
     public function endDirective(): string
     {
-        return 'endforeach; endif;';
+        return '<?php endforeach; endif; ?>';
     }
 
 }

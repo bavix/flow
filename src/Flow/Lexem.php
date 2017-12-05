@@ -18,11 +18,10 @@ class Lexem
      * @var array
      */
     protected $types = [
-        'callable' => '[\w()]+',
+        'callable' => '[\w\s(,\'")]+',
         'variable' => '\w+',
         'array'    => '(array\(|\[)[\s\S]*(\]|\))',
         'ternary'  => '\X+\?\X*:\X+',
-        'range'    => '\X+[\s\t]*\.\.\.[\s\t]*\X+',
         'any'      => '\X+',
     ];
 
@@ -38,12 +37,12 @@ class Lexem
     /**
      * @var array
      */
-    protected $props  = [];
+    protected $props = [];
 
     /**
      * @var array
      */
-    protected $data   = [];
+    protected $data = [];
 
     /**
      * @var array
@@ -61,11 +60,19 @@ class Lexem
     protected $root;
 
     /**
-     * Lexem constructor.
+     * @var Flow
      */
-    public function __construct()
+    protected $flow;
+
+    /**
+     * Lexem constructor.
+     *
+     * @param Flow $flow
+     */
+    public function __construct(Flow $flow)
     {
         $this->root = \dirname(__DIR__, 2) . '/lexemes';
+        $this->flow = $flow;
     }
 
     /**
@@ -188,15 +195,19 @@ class Lexem
     protected function syntax(string $key, array $data)
     {
         $this->closed[$key] = $data['closed'] ?? false;
-        $this->properties($data['properties']);
+        $this->properties($data['properties'] ?? []);
 
         $syntax = [];
 
-        foreach ($data['syntax'] as $text)
+        foreach ($data['syntax'] ?? [] as $text)
         {
             $tokens = $this->lexer()->tokens($text);
             $vars   = $tokens[Lexer::PRINTER] ?? [];
-            $code   = $text;
+            $code   = \str_replace(
+                ['\\(', '\\)', ','],
+                ['\\( ', ' \\)', ' ,'],
+                $text
+            );
 
             foreach ($vars as $var)
             {
@@ -236,7 +247,7 @@ class Lexem
 
         return $this->syntax(
             $key,
-            $loader->asArray()
+            $loader->asArray() ?: []
         );
     }
 
@@ -265,6 +276,51 @@ class Lexem
         }
 
         return $this->data[$key];
+    }
+
+    /**
+     * @param string $key
+     * @param string $tpl
+     *
+     * @return array|null
+     */
+    public function apply(string $key, string $tpl)
+    {
+        $lexData = $this->data($key);
+        $data    = null;
+
+        if (true === $lexData)
+        {
+            return $data;
+        }
+
+        $lexer = new Lexer();
+        $flow  = $this->flow;
+
+        foreach ($lexData as $datum)
+        {
+            if (\preg_match($datum['regexp'], $tpl, $outs))
+            {
+                $data = Arr::filter($outs, function (...$args) {
+                    return \is_string(\end($args));
+                });
+
+                $data = Arr::map($data, function ($value) use ($lexer, $flow) {
+                    $value   = '{{' . $value . '}}';
+                    $tokens  = $lexer->tokens($value);
+                    $_lexer = \current($tokens[Lexer::PRINTER]);
+
+                    return [
+                        'lexer' => $_lexer,
+                        'code'   => $flow->build($_lexer)
+                    ];
+                });
+
+                break;
+            }
+        }
+
+        return $data;
     }
 
 }
