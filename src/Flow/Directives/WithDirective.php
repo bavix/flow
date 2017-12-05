@@ -33,7 +33,7 @@ class WithDirective extends Directive
 
     public function endDirective(): string
     {
-        return '<?php \\' . __CLASS__ . '::pop(' . $this->data['name']['code'] . ')?>';
+        return '<?php \\' . __CLASS__ . '::pop()?>';
     }
 
 }
