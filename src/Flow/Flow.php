@@ -199,7 +199,7 @@ class Flow
     {
         if (0 === Str::pos($key, 'end'))
         {
-            $key = Str::sub($key, 3);
+            $key  = Str::sub($key, 3);
             $data = $this->lexem->data($key);
 
             if (true !== $data)
@@ -229,7 +229,9 @@ class Flow
             $_token = current($operator['tokens']);
             $data   = $this->lexem->data($_token->token);
 
-            if (!$this->ifEnd($operator, $_token->token) && true !== $data)
+            $end = !$this->ifEnd($operator, $_token->token);
+
+            if ($end && true !== $data)
             {
                 $data = $this->lexem->apply(
                     $_token->token,
@@ -239,7 +241,7 @@ class Flow
                 /**
                  * @var Directive $directive
                  */
-                $directive = $this->directive($_token->token, $data?:[], $operator);
+                $directive = $this->directive($_token->token, $data ?: [], $operator);
                 $this->pushDirective($_token->token, $directive);
 
                 $this->tpl = \str_replace(
@@ -270,6 +272,11 @@ class Flow
         $this->printers($this->printers, false);
         $this->printers($this->raws);
         $this->operators();
+
+        foreach ($this->literals as $key => $literal)
+        {
+            $this->tpl = \str_replace($key, $literal, $this->tpl);
+        }
 
         return $this->tpl;
     }

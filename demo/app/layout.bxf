@@ -6,7 +6,7 @@
 {% endliteral %}
 
 {% if a.b === c.d %}
-    {{ route ('hello', [1,2,3]).name }} {{ a.b ~ a['b'].c }}
+    {{ route ('hello', [1,2,3]).name ~' ' ~ a.b ~ s['b'].c }}
 {% elseif a.b === c.a %}
 {% else %}
 {% endif %}
@@ -15,6 +15,7 @@
 {% endfor %}
 
 {% for (key,item) in (a             ? [1,2,3,4] : [4]) %}
+{% forelse %}
 {% endfor %}
 
 {% for user in users %}

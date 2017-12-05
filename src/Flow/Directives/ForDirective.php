@@ -3,9 +3,22 @@
 namespace Bavix\Flow\Directives;
 
 use Bavix\Flow\Directive;
+use Bavix\Flow\Loop;
 
 class ForDirective extends Directive
 {
+
+    protected static $loops = [];
+
+    public static function loop($key, $rows = null)
+    {
+        if (empty($loops[$key]))
+        {
+            $loops[$key] = new Loop($rows);
+        }
+
+        return $loops[$key];
+    }
 
     public function render(): string
     {
@@ -18,16 +31,22 @@ class ForDirective extends Directive
             $init = $rows . '=' . $this->data['rows']['code'] . ';';
         }
 
-        $key = $this->data['key']['code'] ?? $this->randVariable();
-        $row = $this->data['row']['code'];
+        $loop = $this->randVariable();
+        $key  = $this->data['key']['code'] ?? $this->randVariable();
+        $row  = $this->data['row']['code'];
 
         return '<?php ' . $init . 'if (!empty(' . $rows . ')):' .
-            'foreach (' . $rows . ' as ' . $key . ' => ' . $row . '):?>';
+            '\Bavix\Flow\Directives\ForDirective::loop(\'' . $loop . '\', ' . $rows . ');' .
+            'foreach (' . $rows . ' as ' . $key . ' => ' . $row . '): ' .
+            '$loop = \Bavix\Flow\Directives\ForDirective::loop(\'' . $loop . '\');' .
+            '$loop->next(' . $key . ');?>';
     }
 
     public function endDirective(): string
     {
-        return '<?php endforeach; endif; ?>';
+        $variable = '${\'' . ForelseDirective::class . '\'}';
+
+        return '<?php if (empty(' . $variable . ')) { endforeach; unset(' . $variable . '); } endif; ?>';
     }
 
 }
