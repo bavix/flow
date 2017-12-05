@@ -13,7 +13,6 @@
     "bavix/lexer": "^1.0"
   },
   "require-dev": {
-    "matthiasmullie/minify": "^1.3",
     "symfony/yaml": "^3.3"
   },
   "autoload": {

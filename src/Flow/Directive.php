@@ -2,6 +2,7 @@
 
 namespace Bavix\Flow;
 
+use Bavix\Exceptions\Invalid;
 use Bavix\Helpers\Str;
 
 abstract class Directive
@@ -39,7 +40,7 @@ abstract class Directive
      */
     public function endDirective(): string
     {
-        return '';
+        throw new Invalid('Undefined directive `' . $this->operator['fragment']);
     }
 
     /**

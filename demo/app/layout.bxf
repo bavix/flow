@@ -24,3 +24,6 @@
 {% if a.b === c.d %}
     {{ c.d }}
 {% endif %}
+
+{%section hello%}
+{%endsection%}
