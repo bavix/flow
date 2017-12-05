@@ -3,7 +3,7 @@
 namespace Bavix\Flow;
 
 use Bavix\Exceptions\Invalid;
-use Bavix\FlowNative\Helper;
+use Bavix\Flow\Directives\WithDirective;
 use Bavix\Helpers\Arr;
 use Bavix\Helpers\Str;
 use Bavix\Lexer\Lexer;
@@ -91,19 +91,23 @@ class Flow
      */
     protected function fragment(array $tokens)
     {
-        return \implode(' ', Arr::map($tokens['tokens'] ?? $tokens, function (Token $token) {
+        $fragment = \implode(' ', Arr::map($tokens['tokens'] ?? $tokens, function (Token $token) {
             return $token->token;
         }));
+
+        return \str_replace('. ', '.', $fragment);
     }
 
     public function build(array $data)
     {
-        $code = [];
-        $last = null;
+        $code     = [];
+        $lastLast = null;
+        $last     = null;
 
         /**
          * @var Token $token
          * @var Token $last
+         * @var Token $lastLast
          */
         foreach ($data['tokens'] as $token)
         {
@@ -144,8 +148,20 @@ class Flow
                 }
             }
 
-            $last   = $_token;
-            $code[] = $_token->token;
+            if ($last && (!$lastLast ||
+                ($lastLast->type !== T_VARIABLE &&
+                $lastLast->type !== Validator::T_ENDBRACKET &&
+                $lastLast->type !== Validator::T_ENDARRAY))
+                && $last->type === Validator::T_DOT)
+            {
+                $pop = Arr::pop($code);
+                Arr::push($code, '\\' . WithDirective::class . '::last()');
+                Arr::push($code, $pop);
+            }
+
+            $lastLast = $last;
+            $last     = $_token;
+            $code[]   = $_token->token;
         }
 
         return \implode($code);

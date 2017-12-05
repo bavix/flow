@@ -8,4 +8,4 @@ $flow  = new \Bavix\Flow\Flow($native);
 
 $native->addFolder('app', __DIR__ . '/app');
 
-echo $flow->compile('app:layout');
+echo $flow->compile('app:test');

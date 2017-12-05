@@ -39,7 +39,7 @@ abstract class Directive
 
     protected function randVariable(): string
     {
-        return '$' . Str::random(12);
+        return '$' . Str::random(16);
     }
 
     /**

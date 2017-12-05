@@ -11,7 +11,7 @@ $native->addFolder('app', __DIR__ . '/app');
 $lxm = new \Bavix\Flow\Lexem($flow);
 
 //$data = $lxm->apply('for', 'for users as key => user');
-$data = $lxm->apply('for', 'for (key, user) in users');
+$data = $lxm->apply('for', 'for image in .images');
 
 $rows = $data['rows'];
 $row = $data['row'];

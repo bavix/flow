@@ -1,0 +1,4 @@
+closed: true
+
+syntax:
+  - '{{ name }}'
