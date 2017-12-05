@@ -1,3 +1,9 @@
+parameters:
+  path:
+    types:
+      - variable
+      - ternary
+
 syntax:
   - '{{ path }}'
   - 'file={{ path }}'

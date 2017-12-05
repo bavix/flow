@@ -19,7 +19,7 @@ class Lexem
      */
     protected $types = [
         'callable' => '[\w\s(,\'")]+',
-        'variable' => '\w+',
+        'variable' => '[\w\'":]+',
         'array'    => '(array\(|\[)[\s\S]*(\]|\))',
         'ternary'  => '\X+\?\X*:\X+',
         'any'      => '\X+',

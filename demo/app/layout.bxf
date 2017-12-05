@@ -1,9 +1,7 @@
 {{ help}}
 {! help !}
 
-{% literal %}
-    {! help !}
-{% endliteral %}
+{% literal %}{! help !}{% endliteral %}
 
 {% if a.b === c.d %}
     {{ route ('hello', [1,2,3]).name ~' ' ~ a.b ~ s['b'].c }}
@@ -26,4 +24,6 @@
 {% endif %}
 
 {%section hello%}
+    {% include 'app:test' %}
+    {% partial 'app:test' %}
 {%endsection%}

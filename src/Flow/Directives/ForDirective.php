@@ -45,7 +45,7 @@ class ForDirective extends Directive
     public function endDirective(): string
     {
         $variable = '${\'' . ForelseDirective::class . '\'}';
-        
+
         return '<?php unset($loop); if (empty(' . $variable . ')) { endforeach; unset(' . $variable . '); } endif; ?>';
     }
 

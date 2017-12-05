@@ -77,6 +77,14 @@ class Flow
     }
 
     /**
+     * @return FlowNative
+     */
+    public function native(): FlowNative
+    {
+        return $this->native;
+    }
+
+    /**
      * @param array $tokens
      *
      * @return string
@@ -162,7 +170,7 @@ class Flow
     {
         $class = __NAMESPACE__ . '\\Directives\\' . Str::ucFirst($key) . 'Directive';
 
-        return new $class($data, $operator);
+        return new $class($this, $data, $operator);
     }
 
     /**

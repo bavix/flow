@@ -9,6 +9,11 @@ abstract class Directive
 {
 
     /**
+     * @var Flow
+     */
+    protected $flow;
+
+    /**
      * @var array
      */
     protected $data;
@@ -21,11 +26,13 @@ abstract class Directive
     /**
      * Directive constructor.
      *
+     * @param Flow  $flow
      * @param array $data
      * @param array $operator
      */
-    public function __construct(array $data, array $operator)
+    public function __construct(Flow $flow, array $data, array $operator)
     {
+        $this->flow     = $flow;
         $this->data     = $data;
         $this->operator = $operator;
     }
