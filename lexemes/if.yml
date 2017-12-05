@@ -7,3 +7,16 @@ properties:
 
 syntax:
   - '{{ args }}'
+
+directives:
+
+  elseif:
+    properties:
+      args:
+        types:
+          - any
+
+    syntax:
+      - '{{ args }}'
+
+  else:

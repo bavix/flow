@@ -13,3 +13,6 @@ syntax:
   - '{{ rows }} as {{ row }}'
   - '{{ rows }} as {{ key }} => {{ row }}'
   - '\({{ key }}, {{ row }}\) in {{ rows }}'
+
+directives:
+  forelse:

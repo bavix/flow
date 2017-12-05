@@ -194,6 +194,11 @@ class Lexem
      */
     protected function syntax(string $key, array $data)
     {
+        foreach ($data['directives'] ?? [] as $_key => $directive)
+        {
+            $this->data($_key, $directive ?: []);
+        }
+
         $this->closed[$key] = $data['closed'] ?? false;
         $this->properties($data['properties'] ?? []);
 
@@ -229,25 +234,28 @@ class Lexem
 
     /**
      * @param string $key
+     * @param array  $data
      *
      * @return array|bool
      */
-    protected function get(string $key)
+    protected function get(string $key, array $data = null)
     {
         /**
          * @var $loader FileLoader\DataInterface
          */
         $path   = $this->root . '/' . $key;
-        $loader = $this->loader($path);
+        $loader = $this->loader($path)?:$data;
 
-        if (!$loader)
+        if (null === $loader)
         {
             return true;
         }
 
         return $this->syntax(
             $key,
-            $loader->asArray() ?: []
+            (\is_array($loader) ?
+                $loader :
+                $loader->asArray()) ?: []
         );
     }
 
@@ -265,14 +273,15 @@ class Lexem
 
     /**
      * @param string $key
+     * @param array  $data
      *
      * @return array|bool
      */
-    public function data(string $key)
+    public function data(string $key, array $data = null)
     {
         if (empty($this->data[$key]))
         {
-            $this->data[$key] = $this->get($key);
+            $this->data[$key] = $this->get($key, $data);
         }
 
         return $this->data[$key];
@@ -306,13 +315,13 @@ class Lexem
                 });
 
                 $data = Arr::map($data, function ($value) use ($lexer, $flow) {
-                    $value   = '{{' . $value . '}}';
-                    $tokens  = $lexer->tokens($value);
+                    $value  = '{{' . $value . '}}';
+                    $tokens = $lexer->tokens($value);
                     $_lexer = \current($tokens[Lexer::PRINTER]);
 
                     return [
                         'lexer' => $_lexer,
-                        'code'   => $flow->build($_lexer)
+                        'code'  => $flow->build($_lexer)
                     ];
                 });
 
