@@ -3,7 +3,7 @@
 {%section hello%}
     {% with user %}
         <h1>Hello, {{ adf().login}} {{ .last ~ .first }}</h1>
-        {% for image in .images %}
+        {% for image in .images() %}
             <img src="{{ image.path }}" />
         {% endfor %}
     {% endwith %}

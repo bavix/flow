@@ -118,17 +118,28 @@ class Flow
                 throw new Invalid('Undefined object operator `->`!');
             }
 
+            if ($last && (!$lastLast ||
+                    ($lastLast->type !== T_VARIABLE &&
+                        $lastLast->type !== Validator::T_ENDBRACKET &&
+                        $lastLast->type !== Validator::T_ENDARRAY))
+                && $last->type === Validator::T_DOT)
+            {
+                $pop = Arr::pop($code);
+                Arr::push($code, '\\' . WithDirective::class . '::last()');
+                Arr::push($code, $pop);
+            }
+
             if ($_token->type === Validator::T_CONCAT)
             {
                 $_token->token = '.';
             }
 
-            if ($_token->type === T_FUNCTION)
+            if ($last && $last->type !== Validator::T_DOT &&$_token->type === T_FUNCTION)
             {
                 $_token->token = '$this->' . $_token->token;
             }
 
-            if ($_token->type === T_VARIABLE)
+            if (Arr::in([T_VARIABLE, T_FUNCTION], $_token->type))
             {
                 $_token->token = \str_replace('.', '->', $_token->token);
 
@@ -146,17 +157,6 @@ class Flow
                 {
                     $_token->token = '$' . $_token->token;
                 }
-            }
-
-            if ($last && (!$lastLast ||
-                ($lastLast->type !== T_VARIABLE &&
-                $lastLast->type !== Validator::T_ENDBRACKET &&
-                $lastLast->type !== Validator::T_ENDARRAY))
-                && $last->type === Validator::T_DOT)
-            {
-                $pop = Arr::pop($code);
-                Arr::push($code, '\\' . WithDirective::class . '::last()');
-                Arr::push($code, $pop);
             }
 
             $lastLast = $last;
@@ -226,7 +226,7 @@ class Flow
             $key  = Str::sub($key, 3);
             $data = $this->lexem->data($key);
 
-            if (true !== $data)
+            if (true !== $data && $this->lexem->closed($key))
             {
                 $dir = $this->popDirective($key);
 

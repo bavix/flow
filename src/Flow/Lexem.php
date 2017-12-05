@@ -18,7 +18,7 @@ class Lexem
      * @var array
      */
     protected $types = [
-        'callable' => '[\w\s(,\'")]+',
+        'callable' => '[.\w\s(,\'")]+',
         'variable' => '[\w\'":.]+',
         'array'    => '(array\(|\[)[\s\S]*(\]|\))',
         'ternary'  => '\X+\?\X*:\X+',
