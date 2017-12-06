@@ -5,13 +5,23 @@
         {% if !empty(.last) %}
             <h1>Hello, {{ .login}}</h1>
             <h3>{{ .last ~ ' ' ~ .first }}</h3>
+
             {% for image in .['images']() %}
                 {% dump image %}
                 {% with image %}
                     <img src="{! .path !}" />
                 {% endwith %}
+
+            {%forelse%}
+                <h1>empty</h1>
             {% endfor %}
-            {! help !}
+
+            {% for car in .['cars']() %}
+                {% dump(car) %}
+            {%forelse%}
+                <h1>empty</h1>
+            {% endfor %}
+
         {%endif%}
     {% endwith %}
 {%endsection%}

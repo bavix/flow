@@ -20,3 +20,6 @@ syntax:
 
   - '\(\({{ key }}, {{ row }}\) in {{ rows }}\)'
   - '\({{ key }}, {{ row }}\) in {{ rows }}'
+
+directives:
+  forelse:

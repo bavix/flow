@@ -55,6 +55,9 @@ $args = [
                 new Image('http://via.placeholder.com/350x150'),
                 new Image('http://via.placeholder.com/350x150')
             ];
+        },
+        'cars' => function () {
+            return [];
         }
     ])
 ];
