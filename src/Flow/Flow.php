@@ -223,10 +223,10 @@ class Flow
         $begin = $escape ? '\\htmlentities(' : '';
         $end   = $escape ? ')' : '';
 
-        foreach ($raws as $code => $raw)
+        foreach ($raws as $raw)
         {
             $this->tpl = str_replace(
-                $code,
+                $raw['code'],
                 '<?php echo ' . $begin . $this->build($raw) . $end . '; ?>',
                 $this->tpl
             );
