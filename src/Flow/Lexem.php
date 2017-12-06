@@ -315,7 +315,7 @@ class Lexem
                 });
 
                 $data = Arr::map($data, function ($value) use ($lexer, $flow) {
-                    $value  = '{{' . $value . '}}';
+                    $value  = '{{ ' . $value . ' }}';
                     $tokens = $lexer->tokens($value);
                     $_lexer = \current($tokens[Lexer::PRINTER]);
 

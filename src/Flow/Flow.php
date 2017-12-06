@@ -52,6 +52,13 @@ class Flow
     /**
      * @var array
      */
+    protected $functions = [
+        'empty', 'isset', 'unset'
+    ];
+
+    /**
+     * @var array
+     */
     protected $raws;
 
     /**
@@ -67,13 +74,14 @@ class Flow
     /**
      * Flow constructor.
      *
-     * @param FlowNative $native
+     * @param Native $native
      */
-    public function __construct(FlowNative $native)
+    public function __construct(Native $native)
     {
         $this->native = $native;
         $this->lexer  = new Lexer();
         $this->lexem  = new Lexem($this);
+        $this->native->setFlow($this);
     }
 
     /**
@@ -136,7 +144,10 @@ class Flow
 
             if ($last && $last->type !== Validator::T_DOT &&$_token->type === T_FUNCTION)
             {
-                $_token->token = '$this->' . $_token->token;
+                if (!Arr::in($this->functions, $_token->token))
+                {
+                    $_token->token = '$this->' . $_token->token;
+                }
             }
 
             if (Arr::in([T_VARIABLE, T_FUNCTION], $_token->type))
@@ -293,8 +304,8 @@ class Flow
         $this->operators = $tokens[Lexer::OPERATOR];
         $this->raws      = $tokens[Lexer::RAW];
 
-        $this->printers($this->printers, false);
-        $this->printers($this->raws);
+        $this->printers($this->printers);
+        $this->printers($this->raws, false);
         $this->operators();
 
         foreach ($this->literals as $key => $literal)
