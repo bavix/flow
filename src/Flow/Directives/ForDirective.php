@@ -12,12 +12,12 @@ class ForDirective extends Directive
 
     public static function loop($key, $rows = null)
     {
-        if (empty($loops[$key]))
+        if (!\array_key_exists($key, static::$loops))
         {
-            $loops[$key] = new Loop($rows);
+            static::$loops[$key] = new Loop($rows);
         }
 
-        return $loops[$key];
+        return static::$loops[$key];
     }
 
     public function render(): string

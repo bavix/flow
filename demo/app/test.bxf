@@ -7,7 +7,9 @@
             <h3>{{ .last ~ ' ' ~ .first }}</h3>
 
             {% for image in .['images']() %}
-                {% dump image %}
+
+                {% dump (loop, image) %}
+
                 {% with image %}
                     <img src="{! .path !}" />
                 {% endwith %}
