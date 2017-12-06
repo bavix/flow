@@ -3,6 +3,7 @@
 namespace Bavix\Flow;
 
 use Bavix\Exceptions\Invalid;
+use Bavix\Exceptions\Runtime;
 use Bavix\Flow\Directives\WithDirective;
 use Bavix\Helpers\Arr;
 use Bavix\Helpers\Str;
@@ -55,6 +56,11 @@ class Flow
     /**
      * @var array
      */
+    protected $mapDirectives = [];
+
+    /**
+     * @var array
+     */
     protected $functions = [
         'empty',
         'isset',
@@ -94,7 +100,11 @@ class Flow
      */
     public function __construct(Native $native, array $options)
     {
+        // configs
         $this->debug      = $options['debug'] ?? false;
+        $this->mapDirectives = $options['directives'] ?? [];
+
+        // init
         $this->native     = $native;
         $this->lexer      = new Lexer();
         $this->lexem      = new Lexem($this);
@@ -130,7 +140,7 @@ class Flow
      *
      * @return string
      */
-    protected function fragment(array $tokens)
+    protected function fragment(array $tokens): string
     {
         $fragment = \implode(' ', Arr::map($tokens['tokens'] ?? $tokens, function (Token $token) {
             return $token->token;
@@ -139,7 +149,7 @@ class Flow
         return \str_replace('. ', '.', $fragment);
     }
 
-    public function build(array $data)
+    public function build(array $data): string
     {
         $code     = [];
         $lastLast = null;
@@ -229,7 +239,7 @@ class Flow
         return $this->fileSystem->get($view);
     }
 
-    protected function printers($raws, $escape = true)
+    protected function printers(array $raws, $escape = true)
     {
         $begin = $escape ? '\\htmlentities(' : '';
         $end   = $escape ? ')' : '';
@@ -247,6 +257,11 @@ class Flow
     protected function directive(string $key, array $data, array $operator)
     {
         $class = __NAMESPACE__ . '\\Directives\\' . Str::ucFirst($key) . 'Directive';
+
+        if (isset($this->mapDirectives[$key]))
+        {
+            $class = $this->mapDirectives[$key];
+        }
 
         return new $class($this, $data, $operator);
     }
@@ -372,6 +387,23 @@ class Flow
         $this->printers($this->printers);
         $this->printers($this->raws, false);
         $this->operators();
+
+        // check directives
+        foreach ($this->directives as $name => $items)
+        {
+            if ($this->lexem->closed($name))
+            {
+                if (!empty($items))
+                {
+                    throw new Runtime(
+                        \sprintf(
+                            'Directive %s not closed',
+                            get_class(Arr::pop($items))
+                        )
+                    );
+                }
+            }
+        }
 
         foreach ($this->literals as $key => $literal)
         {

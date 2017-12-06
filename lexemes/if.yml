@@ -6,7 +6,6 @@ properties:
       - any
 
 syntax:
-  - '\({{ args }}\)'
   - '{{ args }}'
 
 directives:
@@ -18,7 +17,6 @@ directives:
           - any
 
     syntax:
-      - '\({{ args }}\)'
       - '{{ args }}'
 
   else:

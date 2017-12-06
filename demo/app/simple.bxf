@@ -1,9 +1,13 @@
 {% set begin = -10 %}
 {% set end = -4 %}
 
-{% set data = range(1,100) + [1,2,3,4] %}
+{% set items = range(1,100) + [1,2,3,4] %}
 
 <h1>{{ substr(help, begin, end) }}</h1>
-<h2>{% dump(data) %}</h2>
 
-
+{% for item in items %}
+    {{ item }} -
+    {% if (item % 3) %}Fizz{%endif%}
+    {% if (item % 5) %}Bazz{%endif%}
+    <br />
+{% endfor %}

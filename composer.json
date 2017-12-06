@@ -10,10 +10,8 @@
   ],
   "require": {
     "bavix/flow-native": "^1.0",
+    "symfony/yaml": "^3.3",
     "bavix/lexer": "^1.0"
-  },
-  "require-dev": {
-    "symfony/yaml": "^3.3"
   },
   "autoload": {
     "psr-4": {
