@@ -12,6 +12,12 @@
                     <img src="{! .path !}" />
                 {% endwith %}
 
+                {% for item in .['images']() %}
+                    <h1>{%dump(item)%}</h1>
+                {%forelse%}
+
+                {%endfor%}
+
             {%forelse%}
                 <h1>empty</h1>
             {% endfor %}
