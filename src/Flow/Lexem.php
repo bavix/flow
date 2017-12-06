@@ -68,10 +68,16 @@ class Lexem
      * Lexem constructor.
      *
      * @param Flow $flow
+     * @param string $root
      */
-    public function __construct(Flow $flow)
+    public function __construct(Flow $flow, string $root = null)
     {
-        $this->root = \dirname(__DIR__, 2) . '/lexemes';
+        if (!$root)
+        {
+            $root = \dirname(__DIR__, 2);
+        }
+
+        $this->root = $root . '/lexemes';
         $this->flow = $flow;
     }
 
