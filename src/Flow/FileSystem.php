@@ -41,7 +41,7 @@ class FileSystem
         $real = $this->flow->native()->path($view . $this->flow->ext());
         $directory = \dirname($path);
 
-        if (true || !File::exists($path))
+        if ($this->flow->debugMode() || !File::exists($path))
         {
             Dir::make($directory);
 

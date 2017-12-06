@@ -82,18 +82,29 @@ class Flow
     protected $tpl;
 
     /**
+     * @var bool
+     */
+    protected $debug;
+
+    /**
      * Flow constructor.
      *
      * @param Native $native
-     * @param string $cache
+     * @param array  $options
      */
-    public function __construct(Native $native, string $cache)
+    public function __construct(Native $native, array $options)
     {
+        $this->debug      = $options['debug'] ?? false;
         $this->native     = $native;
         $this->lexer      = new Lexer();
         $this->lexem      = new Lexem($this);
-        $this->fileSystem = new FileSystem($this, $cache);
+        $this->fileSystem = new FileSystem($this, $options['cache']);
         $this->native->setFlow($this);
+    }
+
+    public function debugMode()
+    {
+        return $this->debug;
     }
 
     public function fileSystem(): FileSystem
