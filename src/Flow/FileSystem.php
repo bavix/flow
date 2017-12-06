@@ -41,12 +41,12 @@ class FileSystem
         $real = $this->flow->native()->path($view . $this->flow->ext());
         $directory = \dirname($path);
 
-//        if (!File::exists($path))
-//        {
+        if (!File::exists($path))
+        {
             Dir::make($directory);
 
             return false;
-//        }
+        }
 
         return \filemtime($path) > \filemtime($real);
     }
