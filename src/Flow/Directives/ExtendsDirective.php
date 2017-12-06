@@ -9,7 +9,7 @@ class ExtendsDirective extends Directive
 
     public function render(): string
     {
-        return '<?php $this->ext->blocks()->extends(' . $this->data['path']['code'] . ')?>';
+        return '<?php $this->ext->blocks()->extends($this->flow->path(' . $this->data['path']['code'] . '))?>';
     }
 
 }

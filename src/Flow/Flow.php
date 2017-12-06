@@ -67,6 +67,11 @@ class Flow
     protected $native;
 
     /**
+     * @var FileSystem
+     */
+    protected $fileSystem;
+
+    /**
      * @var string
      */
     protected $tpl;
@@ -75,13 +80,20 @@ class Flow
      * Flow constructor.
      *
      * @param Native $native
+     * @param string $cache
      */
-    public function __construct(Native $native)
+    public function __construct(Native $native, string $cache)
     {
-        $this->native = $native;
-        $this->lexer  = new Lexer();
-        $this->lexem  = new Lexem($this);
+        $this->native     = $native;
+        $this->lexer      = new Lexer();
+        $this->lexem      = new Lexem($this);
+        $this->fileSystem = new FileSystem($this, $cache);
         $this->native->setFlow($this);
+    }
+
+    public function ext(): string
+    {
+        return '.' . $this->ext;
     }
 
     /**
@@ -142,11 +154,19 @@ class Flow
                 $_token->token = '.';
             }
 
-            if ($last && $last->type !== Validator::T_DOT &&$_token->type === T_FUNCTION)
+            if ($last && $last->type !== Validator::T_DOT && $_token->type === T_FUNCTION)
             {
                 if (!Arr::in($this->functions, $_token->token))
                 {
                     $_token->token = '$this->' . $_token->token;
+                }
+            }
+
+            if (Arr::in([Validator::T_BRACKET, T_ARRAY], $_token->type))
+            {
+                if ($last && $last->type === Validator::T_DOT)
+                {
+                    Arr::pop($code);
                 }
             }
 
@@ -160,11 +180,11 @@ class Flow
                     Arr::push($code, '->');
                 }
 
-                if (!$last || (
+                if ($_token->type !== T_FUNCTION && (!$last || (
                         $last->type !== Validator::T_ENDARRAY &&
                         $last->type !== Validator::T_ENDBRACKET &&
                         $last->type !== Validator::T_DOT
-                    ))
+                    )))
                 {
                     $_token->token = '$' . $_token->token;
                 }
@@ -176,6 +196,16 @@ class Flow
         }
 
         return \implode($code);
+    }
+
+    public function path(string $view): string
+    {
+        if (!$this->fileSystem->has($view))
+        {
+            $this->fileSystem->set($view, $this->compile($view));
+        }
+
+        return $this->fileSystem->get($view);
     }
 
     protected function printers($raws, $escape = true)
@@ -290,13 +320,27 @@ class Flow
 
     /**
      * @param string $view
+     * @param array $data
      *
      * @return string
      */
-    public function compile($view)
+    public function render(string $view, array $data = []): string
     {
-        $path      = $this->native->path($view . '.' . $this->ext);
-        $this->tpl = file_get_contents($path);
+        return $this->native()->render(
+            $this->path($view),
+            $data
+        );
+    }
+
+    /**
+     * @param string $view
+     *
+     * @return string
+     */
+    public function compile(string $view): string
+    {
+        $path      = $this->native->path($view . $this->ext());
+        $this->tpl = \file_get_contents($path);
         $tokens    = $this->lexer->tokens($this->tpl);
 
         $this->literals  = $tokens[Lexer::LITERAL];

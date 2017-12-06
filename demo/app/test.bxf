@@ -3,12 +3,15 @@
 {%section hello%}
     {% with user %}
         {% if !empty(.last) %}
-            <h1>Hello, {{ adf().login}} {{ .last ~ .first }}</h1>
-            {% for image in .images() %}
-                <img src="{{ image.path }}" />
-            {% forelse %}
-                <h1>Нет изображений</h1>
+            <h1>Hello, {{ .login}}</h1>
+            <h3>{{ .last ~ ' ' ~ .first }}</h3>
+            {% for image in .['images']() %}
+                {% dump image %}
+                {% with image %}
+                    <img src="{! .path !}" />
+                {% endwith %}
             {% endfor %}
+            {! help !}
         {%endif%}
     {% endwith %}
 {%endsection%}

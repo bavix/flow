@@ -35,7 +35,7 @@ class ForDirective extends Directive
         $key  = $this->data['key']['code'] ?? $this->randVariable();
         $row  = $this->data['row']['code'];
 
-        return '<?php ' . $init . 'if (!empty(' . $rows . ')):' .
+        return '<?php ' . $init .
             '\Bavix\Flow\Directives\ForDirective::loop(\'' . $loop . '\', ' . $rows . ');' .
             'foreach (' . $rows . ' as ' . $key . ' => ' . $row . '): ' .
             '$loop = \Bavix\Flow\Directives\ForDirective::loop(\'' . $loop . '\');' .
@@ -44,9 +44,7 @@ class ForDirective extends Directive
 
     public function endDirective(): string
     {
-        $variable = '${\'' . ForelseDirective::class . '\'}';
-
-        return '<?php unset($loop); if (empty(' . $variable . ')) { endforeach; unset(' . $variable . '); } endif; ?>';
+        return '<?php unset($loop); endforeach; ?>';
     }
 
 }

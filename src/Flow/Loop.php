@@ -30,10 +30,13 @@ class Loop
 
     public function __construct($data)
     {
-        $this->firstIndex = \key($data);
-        \end($data);
-        $this->lastIndex = \key($data);
-        \reset($data);
+        if (!empty($data))
+        {
+            $this->firstIndex = \key($data);
+            \end($data);
+            $this->lastIndex = \key($data);
+            \reset($data);
+        }
     }
 
     public function next($key)

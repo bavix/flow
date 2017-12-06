@@ -10,7 +10,8 @@
   ],
   "require": {
     "bavix/flow-native": "^1.0",
-    "bavix/lexer": "^1.0"
+    "bavix/lexer": "^1.0",
+    "psr/cache": "^1.0"
   },
   "require-dev": {
     "symfony/yaml": "^3.3"

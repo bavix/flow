@@ -3,27 +3,6 @@
 
 {% literal %}{! help !}{% endliteral %}
 
-{% if a.b === c.d %}
-    {{ route ('hello', [1,2,3]).name ~' ' ~ a.b ~ s['b'].c }}
-{% elseif a.b === c.a %}
-{% else %}
-{% endif %}
-
-{% for (a             ? [1,2,3,4] : [4])as key=>item %}
-{% endfor %}
-
-{% for (key,item) in (a             ? [1,2,3,4] : [4]) %}
-{% forelse %}
-{% endfor %}
-
-{% for user in users %}
-{% endfor %}
-
-{% if a.b === c.d %}
-    {{ c.d }}
-{% endif %}
-
 {%section hello%}
-    {% include 'app:test' %}
     {% partial 'app:test' %}
 {%endsection%}
