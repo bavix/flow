@@ -285,7 +285,7 @@ class Lexem
      */
     public function data(string $key, array $data = null)
     {
-        if (!array_key_exists($key, $this->data))
+        if (!\array_key_exists($key, $this->data))
         {
             $this->data[$key] = $this->get($key, $data);
         }

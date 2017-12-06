@@ -1,0 +1,11 @@
+properties:
+  var:
+    types:
+      - variable
+
+  mixed:
+    types:
+      - any
+
+syntax:
+  - '{{ var }} = {{ mixed }}'

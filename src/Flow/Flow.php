@@ -175,7 +175,7 @@ class Flow
                 $_token->token = '.';
             }
 
-            if ($last && $last->type !== Validator::T_DOT && $_token->type === T_FUNCTION)
+            if ((!$last || ($last && $last->type !== Validator::T_DOT)) && $_token->type === T_FUNCTION)
             {
                 if (!Arr::in($this->functions, $_token->token))
                 {
