@@ -9,7 +9,14 @@ properties:
       - ternary
 
 syntax:
+  - '\({{ row }} in {{ rows }}\)'
   - '{{ row }} in {{ rows }}'
+
+  - '\({{ rows }} as {{ row }}\)'
   - '{{ rows }} as {{ row }}'
+
+  - '\({{ rows }} as {{ key }} => {{ row }}\)'
   - '{{ rows }} as {{ key }} => {{ row }}'
+
+  - '\(\({{ key }}, {{ row }}\) in {{ rows }}\)'
   - '\({{ key }}, {{ row }}\) in {{ rows }}'

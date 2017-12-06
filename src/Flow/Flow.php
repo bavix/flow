@@ -14,6 +14,9 @@ use Bavix\Lexer\Validator;
 class Flow
 {
 
+    const VER_TIME = 1512562842;
+    const VERSION  = '1.0.0-alpha';
+
     /**
      * @var string
      */
@@ -53,7 +56,9 @@ class Flow
      * @var array
      */
     protected $functions = [
-        'empty', 'isset', 'unset'
+        'empty',
+        'isset',
+        'unset'
     ];
 
     /**
@@ -89,6 +94,11 @@ class Flow
         $this->lexem      = new Lexem($this);
         $this->fileSystem = new FileSystem($this, $cache);
         $this->native->setFlow($this);
+    }
+
+    public function fileSystem(): FileSystem
+    {
+        return $this->fileSystem;
     }
 
     public function ext(): string
@@ -181,10 +191,10 @@ class Flow
                 }
 
                 if ($_token->type !== T_FUNCTION && (!$last || (
-                        $last->type !== Validator::T_ENDARRAY &&
-                        $last->type !== Validator::T_ENDBRACKET &&
-                        $last->type !== Validator::T_DOT
-                    )))
+                            $last->type !== Validator::T_ENDARRAY &&
+                            $last->type !== Validator::T_ENDBRACKET &&
+                            $last->type !== Validator::T_DOT
+                        )))
                 {
                     $_token->token = '$' . $_token->token;
                 }
@@ -320,7 +330,7 @@ class Flow
 
     /**
      * @param string $view
-     * @param array $data
+     * @param array  $data
      *
      * @return string
      */

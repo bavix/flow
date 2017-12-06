@@ -3,6 +3,7 @@
 
 {% literal %}{! help !}{% endliteral %}
 
-{%section hello%}
-    {% partial 'app:test' %}
-{%endsection%}
+{%section hello%}{%endsection%}
+
+{% include 'app:test2' %}
+{% partial 'app:test' %}
