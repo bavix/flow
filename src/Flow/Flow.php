@@ -15,8 +15,8 @@ use Bavix\Lexer\Validator;
 class Flow
 {
 
-    const VER_TIME = 1512562842;
-    const VERSION  = '1.0.0-alpha';
+    const VER_TIME = 1512632196;
+    const VERSION  = '1.0.0-alpha2';
 
     /**
      * @var string
