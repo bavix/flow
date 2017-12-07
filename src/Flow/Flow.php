@@ -169,6 +169,16 @@ class Flow
                 throw new Invalid('Undefined object operator `->`!');
             }
 
+            if ($_token->type === T_INSTANCEOF)
+            {
+                $lastLast = $last;
+                $last     = $_token;
+                $code[] = ' ';
+                $code[] = $_token->token;
+                $code[] = ' ';
+                continue;
+            }
+
             if ($last && (!$lastLast ||
                     ($lastLast->type !== T_VARIABLE &&
                         $lastLast->type !== Validator::T_ENDBRACKET &&
@@ -214,7 +224,8 @@ class Flow
                 if ($_token->type !== T_FUNCTION && (!$last || (
                             $last->type !== Validator::T_ENDARRAY &&
                             $last->type !== Validator::T_ENDBRACKET &&
-                            $last->type !== Validator::T_DOT
+                            $last->type !== Validator::T_DOT &&
+                            $last->type !== T_NS_SEPARATOR
                         )))
                 {
                     $_token->token = '$' . $_token->token;

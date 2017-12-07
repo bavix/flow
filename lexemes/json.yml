@@ -1,0 +1,8 @@
+properties:
+  var:
+    types:
+      - variable
+
+syntax:
+  - '\({{ var }}\)'
+  - '{{ var }}'
