@@ -246,10 +246,11 @@ class Flow
 
         foreach ($raws as $raw)
         {
-            $this->tpl = str_replace(
-                $raw['code'],
+            $this->tpl = \preg_replace(
+                '~' . \preg_quote($raw['code'], '~') . '~u',
                 '<?php echo ' . $begin . $this->build($raw) . $end . '; ?>',
-                $this->tpl
+                $this->tpl,
+                1
             );
         }
     }
@@ -307,10 +308,11 @@ class Flow
             {
                 $dir = $this->popDirective($key);
 
-                $this->tpl = \str_replace(
-                    $operator['code'],
+                $this->tpl = \preg_replace(
+                    '~' . \preg_quote($operator['code'], '~') . '~u',
                     $dir->endDirective(),
-                    $this->tpl
+                    $this->tpl,
+                    1
                 );
             }
 

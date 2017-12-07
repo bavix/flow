@@ -10,4 +10,13 @@
     {% if (item % 3 === 0) %}Fizz{%endif%}
     {% if (item % 5 === 0) %}Bazz{%endif%}
     <br />
+{%forelse%}
+
+    {% for item in items %}
+        {{ item }} -
+        {% if (item % 3 === 0) %}Fizz{%endif%}
+        {% if (item % 5 === 0) %}Bazz{%endif%}
+        <br />
+    {% endfor %}
+
 {% endfor %}

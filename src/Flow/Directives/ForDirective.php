@@ -4,10 +4,15 @@ namespace Bavix\Flow\Directives;
 
 use Bavix\Flow\Directive;
 use Bavix\Flow\Loop;
+use Bavix\Helpers\Arr;
 
 class ForDirective extends Directive
 {
 
+    const T_END = 1;
+    const T_ELSE = 2;
+
+    protected static $for   = [];
     protected static $loops = [];
 
     public static function loop($key, $rows = null)
@@ -20,8 +25,15 @@ class ForDirective extends Directive
         return static::$loops[$key];
     }
 
+    public static function else()
+    {
+        static::$for[\count(static::$for) - 1] = static::T_ELSE;
+    }
+
     public function render(): string
     {
+        Arr::push(static::$for, static::T_END);
+
         $init = '';
         $rows = $this->data['rows']['code'];
 
@@ -44,9 +56,8 @@ class ForDirective extends Directive
 
     public function endDirective(): string
     {
-        if (ForelseDirective::get())
+        if (Arr::pop(static::$for) === static::T_ELSE)
         {
-            ForelseDirective::pop();
             return '<?php unset($loop); endif; ?>';
         }
 
