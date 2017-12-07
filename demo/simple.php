@@ -14,6 +14,18 @@ $native->addFolder('app', __DIR__ . '/app');
 $helper->add('substr', '\mb_substr');
 $helper->add('range', '\range');
 
-echo $flow->render('app:simple', [
-    'help' => __FILE__
-]);
+$args = [
+    'help' => __FILE__,
+];
+
+if (\random_int(0, 1))
+{
+    $args['items'] = (function () {
+        foreach (\range(1, 100) as $item)
+        {
+            yield $item;
+        }
+    })();
+}
+
+echo $flow->render('app:simple', $args);
