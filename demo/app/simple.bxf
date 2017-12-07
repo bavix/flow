@@ -3,6 +3,10 @@
 
 {% if empty(items) %}
     {% set items = range(1,25) + [1,2,3,4] %}
+
+    {% with items %}
+        {% set .['0'] = 25 %}
+    {% endwith %}
 {% endif %}
 
 <h1>{{ substr(help, begin, end) }}</h1>
