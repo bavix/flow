@@ -53,19 +53,14 @@ class Lexem
     protected $closed = [];
 
     /**
-     * @var Lexer
-     */
-    protected $lexer;
-
-    /**
      * @var string[]
      */
     protected $folders = [];
 
     /**
-     * @var string
+     * @var Lexer
      */
-    protected $root;
+    protected $lexer;
 
     /**
      * @var Flow
@@ -227,17 +222,22 @@ class Lexem
     }
 
     /**
+     * @param string $key
      * @param string $name
      * @param array  $syntax
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    protected function store(string $name, array $syntax)
+    protected function store(string $key, string $name, array $syntax)
     {
         if ($this->pool)
         {
             $item = $this->pool->getItem($name);
-            $item->set($syntax);
+            $item->set([
+                'syntax' => $syntax,
+                'closed' => $this->closed($key),
+            ]);
+
             $this->pool->save($item);
         }
     }
@@ -259,14 +259,17 @@ class Lexem
 
             if ($item->isHit())
             {
-                $syntax = $item->get();
+                $_cache = $item->get();
+                $syntax = $_cache['syntax'];
+
+                $this->closed[$key] = $_cache['closed'];
             }
         }
 
         if (empty($syntax))
         {
             $syntax = $this->syntax($key, $data);
-            $this->store($name, $syntax);
+            $this->store($key, $name, $syntax);
         }
 
         return $syntax;
