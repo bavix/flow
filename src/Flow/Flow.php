@@ -184,10 +184,10 @@ class Flow
     {
         if (!$this->lexeme)
         {
-            $this->lexeme = new Lexeme($this);
+            $this->setLexeme(new Lexeme($this));
         }
 
-        return $this->loadLexemes()->lexeme;
+        return $this->lexeme;
     }
 
     /**
@@ -242,11 +242,15 @@ class Flow
      */
     protected function fragment(array $tokens): string
     {
-        $fragment = \implode(' ', Arr::map($tokens['tokens'] ?? $tokens, function (Token $token) {
+        $data = Arr::map($tokens['tokens'] ?? $tokens, function (Token $token) {
             return $token->token;
-        }));
+        });
 
-        return \str_replace('. ', '.', $fragment);
+        return \str_replace(
+            '. ',
+            '.',
+            \implode(' ', $data)
+        );
     }
 
     /**
@@ -559,7 +563,7 @@ class Flow
                     throw new Runtime(
                         \sprintf(
                             'Directive %s not closed',
-                            get_class(Arr::pop($items))
+                            \get_class(Arr::pop($items))
                         )
                     );
                 }

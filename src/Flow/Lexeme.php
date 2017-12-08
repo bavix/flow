@@ -5,6 +5,7 @@ namespace Bavix\Flow;
 use Bavix\Helpers\Arr;
 use Bavix\Lexer\Lexer;
 use Bavix\SDK\FileLoader;
+use Psr\Cache\CacheItemInterface;
 
 /**
  * Class Lexeme
@@ -123,7 +124,7 @@ class Lexeme
                 }
                 catch (\Throwable $throwable)
                 {
-
+                    // skip...
                 }
             }
         }
@@ -227,35 +228,45 @@ class Lexeme
 
     /**
      * @param string $key
-     * @param string $name
-     * @param array  $syntax
+     * @param array  $mixed
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    protected function store(string $key, array $syntax)
+    protected function store(string $key, array $mixed)
     {
         if ($this->flow->pool())
         {
             $item = $this->getItem($key);
-
-            $item->set([
-                'syntax' => $syntax,
-                'props'  => $this->props[$key] ?? null,
-                'closed' => $this->closed[$key] ?? false,
-            ]);
-
+            $item->set($mixed);
             $this->flow->pool()->save($item);
         }
     }
 
+    /**
+     * @param string $key
+     * @param array  $syntax
+     *
+     * @return void
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function syntaxStore(string $key, array $syntax)
+    {
+        $this->store($key, [
+            'syntax' => $syntax,
+            'props'  => $this->props[$key] ?? null,
+            'closed' => $this->closed[$key] ?? false,
+        ]);
+    }
+
     protected function name(string $key)
     {
-        return $key . Flow::VERSION;
+        return \crc32($key) . Flow::VERSION;
     }
 
     protected function tryLoad(string $key)
     {
-        if ($this->flow->pool() && empty($this->data[$key]))
+        if (empty($this->data[$key]) && $this->flow->pool())
         {
             $item = $this->getItem($key);
 
@@ -288,7 +299,7 @@ class Lexeme
         if (empty($this->data[$key]) || !$syntax)
         {
             $syntax = $this->syntax($key, $data);
-            $this->store($key, $syntax);
+            $this->syntaxStore($key, $syntax);
         }
 
         return $syntax;
@@ -405,6 +416,42 @@ class Lexeme
     }
 
     /**
+     * @param string $value
+     *
+     * @return array
+     */
+    public function lexerApply(string $value): array
+    {
+        $name = __FUNCTION__ . $value;
+
+        if ($this->flow->pool())
+        {
+            /**
+             * @var $item CacheItemInterface
+             */
+            $item = $this->getItem($name);
+
+            if ($item->isHit())
+            {
+                return $item->get();
+            }
+        }
+
+        $value  = '{{ ' . $value . ' }}';
+        $tokens = $this->flow->lexer()->tokens($value);
+        $_lexer = \current($tokens[Lexer::PRINTER]);
+
+        $store = [
+            'lexer' => $_lexer,
+            'code'  => $this->flow->build($_lexer)
+        ];
+
+        $this->store($name, $store);
+
+        return $store;
+    }
+
+    /**
      * @param string $key
      * @param string $tpl
      *
@@ -420,9 +467,6 @@ class Lexeme
             return $data;
         }
 
-        $lexer = new Lexer();
-        $flow  = $this->flow;
-
         foreach ($lexData as $datum)
         {
             if (\preg_match($datum['regexp'], $tpl, $outs))
@@ -431,17 +475,7 @@ class Lexeme
                     return \is_string(\end($args));
                 });
 
-                $data = Arr::map($data, function ($value) use ($lexer, $flow) {
-                    $value  = '{{ ' . $value . ' }}';
-                    $tokens = $lexer->tokens($value);
-                    $_lexer = \current($tokens[Lexer::PRINTER]);
-
-                    return [
-                        'lexer' => $_lexer,
-                        'code'  => $flow->build($_lexer)
-                    ];
-                });
-
+                $data = Arr::map($data, [$this, 'lexerApply']);
                 break;
             }
         }

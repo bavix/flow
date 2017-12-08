@@ -14,7 +14,7 @@ $flow   = new \Bavix\Flow\Flow($native, [
     'debug'      => true,
     'minify'     => true,
     'lexemes'    => [
-        __DIR__ . '/lexemes'
+        __DIR__ . '/lexemes',
     ],
     'directives' => [
         'll' => Demo\Directives\LlDirective::class
