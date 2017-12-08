@@ -3,17 +3,15 @@
 namespace Bavix\Flow;
 
 use Bavix\Helpers\Arr;
-use Bavix\Helpers\JSON;
 use Bavix\Lexer\Lexer;
 use Bavix\SDK\FileLoader;
-use Psr\Cache\CacheItemPoolInterface;
 
 /**
- * Class Lexem
+ * Class Lexeme
  *
  * @package Bavix\Flow
  */
-class Lexem
+class Lexeme
 {
 
     /**
@@ -53,6 +51,11 @@ class Lexem
     protected $closed = [];
 
     /**
+     * @var array
+     */
+    protected $items = [];
+
+    /**
      * @var string[]
      */
     protected $folders = [];
@@ -68,12 +71,7 @@ class Lexem
     protected $flow;
 
     /**
-     * @var CacheItemPoolInterface
-     */
-    protected $pool;
-
-    /**
-     * Lexem constructor.
+     * Lexeme constructor.
      *
      * @param Flow $flow
      */
@@ -81,18 +79,6 @@ class Lexem
     {
         $this->addFolder(\dirname(__DIR__, 2) . '/lexemes');
         $this->flow = $flow;
-    }
-
-    /**
-     * @param CacheItemPoolInterface $pool
-     *
-     * @return $this
-     */
-    public function setPool(CacheItemPoolInterface $pool): self
-    {
-        $this->pool = $pool;
-
-        return $this;
     }
 
     /**
@@ -223,23 +209,42 @@ class Lexem
 
     /**
      * @param string $key
+     *
+     * @return mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function getItem(string $key)
+    {
+        $name = $this->name($key);
+
+        if (empty($this->items[$name]))
+        {
+            $this->items[$name] = $this->flow->pool()->getItem($name);
+        }
+
+        return $this->items[$name];
+    }
+
+    /**
+     * @param string $key
      * @param string $name
      * @param array  $syntax
      *
      * @throws \Psr\Cache\InvalidArgumentException
      */
-    protected function store(string $key, string $name, array $syntax)
+    protected function store(string $key, array $syntax)
     {
-        if ($this->pool)
+        if ($this->flow->pool())
         {
-            $item = $this->pool->getItem($name);
+            $item = $this->getItem($key);
+
             $item->set([
                 'syntax' => $syntax,
-                'props' => $this->props[$key] ?? null,
+                'props'  => $this->props[$key] ?? null,
                 'closed' => $this->closed[$key] ?? false,
             ]);
 
-            $this->pool->save($item);
+            $this->flow->pool()->save($item);
         }
     }
 
@@ -250,17 +255,16 @@ class Lexem
 
     protected function tryLoad(string $key)
     {
-        if ($this->pool && empty($this->data[$key]))
+        if ($this->flow->pool() && empty($this->data[$key]))
         {
-            $item = $this->pool->getItem(
-                $this->name($key)
-            );
+            $item = $this->getItem($key);
 
             if ($item->isHit())
             {
                 $_cache = $item->get();
-                $this->data[$key] = $_cache['syntax'];
-                $this->props[$key] = $_cache['props'];
+
+                $this->data[$key]   = $_cache['syntax'];
+                $this->props[$key]  = $_cache['props'];
                 $this->closed[$key] = $_cache['closed'];
 
                 return $this->data[$key];
@@ -283,9 +287,8 @@ class Lexem
 
         if (empty($this->data[$key]) || !$syntax)
         {
-            $name = $this->name($key);
             $syntax = $this->syntax($key, $data);
-            $this->store($key, $name, $syntax);
+            $this->store($key, $syntax);
         }
 
         return $syntax;
@@ -391,9 +394,10 @@ class Lexem
      */
     public function data(string $key, array $data = null)
     {
+        $this->tryLoad($key);
+
         if (!\array_key_exists($key, $this->data))
         {
-            $this->tryLoad($key);
             $this->data[$key] = $this->get($key, $data);
         }
 

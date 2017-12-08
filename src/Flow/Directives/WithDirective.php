@@ -8,7 +8,7 @@ use Bavix\Helpers\Arr;
 class WithDirective extends Directive
 {
 
-    protected static $index = 0;
+    protected static $index   = 0;
     protected static $storage = [];
 
     public static function &last()
@@ -19,7 +19,7 @@ class WithDirective extends Directive
     public static function push(&$data)
     {
         static::$storage[] = &$data;
-        static::$index = \count(static::$storage) - 1;
+        static::$index     = \count(static::$storage) - 1;
     }
 
     public static function pop()

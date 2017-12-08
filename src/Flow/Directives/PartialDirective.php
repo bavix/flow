@@ -11,7 +11,7 @@ class PartialDirective extends Directive
     {
         return '<?php echo \file_get_contents($this->native->path(' .
             $this->data['path']['code'] .
-            '.\''.$this->flow->ext() . '\'))?>';
+            '.\'' . $this->flow->ext() . '\'))?>';
     }
 
 }

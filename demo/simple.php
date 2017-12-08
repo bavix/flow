@@ -3,15 +3,15 @@
 include_once __DIR__ . '/boostrap.php';
 
 $native = new \Bavix\Flow\Native();
-$flow  = new \Bavix\Flow\Flow($native, [
-    'cache' => __DIR__ . '/cache',
-    'debug' => true,
+$flow   = new \Bavix\Flow\Flow($native, [
+    'compile'    => __DIR__ . '/compile',
+    'debug'      => true,
     'directives' => [
         'json' => \Demo\Directives\JsonDirective::class
     ]
 ]);
 
-$flow->lexem()->addFolder(__DIR__ . '/lexemes');
+$flow->lexeme()->addFolder(__DIR__ . '/lexemes');
 
 $native->addFolder('app', __DIR__ . '/view/app');
 

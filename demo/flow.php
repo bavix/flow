@@ -2,26 +2,24 @@
 
 include_once __DIR__ . '/boostrap.php';
 
+$pool = new \Stash\Pool();
+$pool->setDriver(new \Stash\Driver\FileSystem([
+    'path' => __DIR__ . '/cache'
+]));
+
 $native = new \Bavix\Flow\Native();
-$flow  = new \Bavix\Flow\Flow($native, [
-    'cache' => __DIR__ . '/cache',
-    'debug' => true,
-    'minify' => true,
+$flow   = new \Bavix\Flow\Flow($native, [
+    'compile'    => __DIR__ . '/compile',
+    'cache'      => $pool,
+    'debug'      => true,
+    'minify'     => true,
+    'lexemes'    => [
+        __DIR__ . '/lexemes'
+    ],
     'directives' => [
         'll' => Demo\Directives\LlDirective::class
     ]
 ]);
-
-$pool = new \Stash\Pool();
-$pool->setDriver(new \Stash\Driver\FileSystem([
-    'path' => __DIR__ . '/cache/__stash__'
-]));
-
-//$pool->clear();die;
-
-$lexem = $flow->lexem();
-$lexem->setPool($pool);
-$lexem->addFolder(__DIR__ . '/lexemes');
 
 $native->addFolder('bar', __DIR__ . '/view/bar');
 $native->addFolder('foo', __DIR__ . '/view/foo');
@@ -56,6 +54,7 @@ class User implements ArrayAccess
 class Image
 {
     public $path;
+
     public function __construct($path)
     {
         $this->path = $path;
@@ -65,16 +64,16 @@ class Image
 $args = [
     'help' => '<h1>Help me!</h1>',
     'user' => new User([
-        'last' => 'Babichev',
-        'first' => 'Maxim',
-        'login' => 'rez1dent3',
+        'last'   => 'Babichev',
+        'first'  => 'Maxim',
+        'login'  => 'rez1dent3',
         'images' => function () {
             return [
                 new Image('http://via.placeholder.com/350x150'),
                 new Image('http://via.placeholder.com/350x150')
             ];
         },
-        'cars' => function () {
+        'cars'   => function () {
             return [];
         }
     ]),

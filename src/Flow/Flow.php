@@ -5,19 +5,25 @@ namespace Bavix\Flow;
 use Bavix\Exceptions\Invalid;
 use Bavix\Exceptions\Runtime;
 use Bavix\Flow\Directives\WithDirective;
+use Bavix\FlowNative\FlowNative;
 use Bavix\Helpers\Arr;
 use Bavix\Helpers\Str;
 use Bavix\Lexer\Lexer;
-use Bavix\FlowNative\FlowNative;
 use Bavix\Lexer\Token;
 use Bavix\Lexer\Validator;
 use JSMin\JSMin;
+use Psr\Cache\CacheItemPoolInterface;
 
 class Flow
 {
 
     const VER_TIME = 1512632196;
     const VERSION  = '1.0.0-alpha2';
+
+    /**
+     * @var CacheItemPoolInterface
+     */
+    protected $pool;
 
     /**
      * @var string
@@ -30,9 +36,9 @@ class Flow
     protected $lexer;
 
     /**
-     * @var Lexem
+     * @var Lexeme
      */
-    protected $lexem;
+    protected $lexeme;
 
     /**
      * @var array
@@ -60,6 +66,8 @@ class Flow
     protected $mapDirectives = [];
 
     /**
+     * @todo подумать над списком функций
+     *
      * @var array
      */
     protected $functions = [
@@ -74,7 +82,12 @@ class Flow
     /**
      * @var array
      */
-    protected $raws;
+    protected $lexemes = [];
+
+    /**
+     * @var array
+     */
+    protected $rows;
 
     /**
      * @var FlowNative
@@ -110,26 +123,46 @@ class Flow
     public function __construct(Native $native, array $options)
     {
         // configs
-        $this->debug         = $options['debug'] ?? false;
         $this->mapDirectives = $options['directives'] ?? [];
+        $this->lexemes       = $options['lexemes'] ?? [];
         $this->minify        = $options['minify'] ?? false;
+        $this->debug         = $options['debug'] ?? false;
+        $this->pool          = $options['cache'] ?? null;
 
         // init
         $this->native     = $native;
-        $this->fileSystem = new FileSystem($this, $options['cache']);
+        $this->fileSystem = new FileSystem($this, $options['compile']);
         $this->native->setFlow($this);
     }
 
     /**
-     * @param Lexem $lexem
+     * @return CacheItemPoolInterface
+     */
+    public function pool()
+    {
+        return $this->pool;
+    }
+
+    protected function loadLexemes(): self
+    {
+        foreach ($this->lexemes as $folder)
+        {
+            $this->lexeme->addFolder($folder);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Lexeme $lexeme
      *
      * @return $this
      */
-    public function setLexem(Lexem $lexem): self
+    public function setLexeme(Lexeme $lexeme): self
     {
-        $this->lexem = $lexem;
+        $this->lexeme = $lexeme;
 
-        return $this;
+        return $this->loadLexemes();
     }
 
     /**
@@ -145,16 +178,16 @@ class Flow
     }
 
     /**
-     * @return Lexem
+     * @return Lexeme
      */
-    public function lexem(): Lexem
+    public function lexeme(): Lexeme
     {
-        if (!$this->lexem)
+        if (!$this->lexeme)
         {
-            $this->lexem = new Lexem($this);
+            $this->lexeme = new Lexeme($this);
         }
-        
-        return $this->lexem;
+
+        return $this->loadLexemes()->lexeme;
     }
 
     /**
@@ -166,20 +199,29 @@ class Flow
         {
             $this->lexer = new Lexer();
         }
-        
+
         return $this->lexer;
     }
 
-    public function debugMode()
+    /**
+     * @return bool
+     */
+    public function debugMode(): bool
     {
         return $this->debug;
     }
 
+    /**
+     * @return FileSystem
+     */
     public function fileSystem(): FileSystem
     {
         return $this->fileSystem;
     }
 
+    /**
+     * @return string
+     */
     public function ext(): string
     {
         return '.' . $this->ext;
@@ -207,6 +249,11 @@ class Flow
         return \str_replace('. ', '.', $fragment);
     }
 
+    /**
+     * @param array $data
+     *
+     * @return string
+     */
     public function build(array $data): string
     {
         $code     = [];
@@ -227,16 +274,7 @@ class Flow
                 throw new Invalid('Undefined object operator `->`!');
             }
 
-            if (Arr::in([T_NEW, T_CLONE], $_token->type))
-            {
-                $lastLast = $last;
-                $last     = $_token;
-                $code[]   = $_token->token;
-                $code[]   = ' ';
-                continue;
-            }
-
-            if (Arr::in([T_INSTANCEOF, T_AS], $_token->type))
+            if (Arr::in([T_NEW, T_CLONE, T_INSTANCEOF, T_AS], $_token->type))
             {
                 $lastLast = $last;
                 $last     = $_token;
@@ -314,6 +352,11 @@ class Flow
         return \implode($code);
     }
 
+    /**
+     * @param string $view
+     *
+     * @return string
+     */
     protected function minify(string $view): string
     {
         $html = $this->compile($view);
@@ -322,13 +365,18 @@ class Flow
         {
             $html = \Minify_HTML::minify($html, [
                 'cssMinifier' => [\Minify_CSSmin::class, 'minify'],
-                'jsMinifier' => [JSMin::class, 'minify'],
+                'jsMinifier'  => [JSMin::class, 'minify'],
             ]);
         }
 
         return $html;
     }
 
+    /**
+     * @param string $view
+     *
+     * @return string
+     */
     public function path(string $view): string
     {
         if (!$this->fileSystem->has($view))
@@ -339,6 +387,10 @@ class Flow
         return $this->fileSystem->get($view);
     }
 
+    /**
+     * @param array $rows
+     * @param bool  $escape
+     */
     protected function printers(array $rows, $escape = true)
     {
         $begin = $escape ? '\\htmlspecialchars(' : '';
@@ -355,6 +407,13 @@ class Flow
         }
     }
 
+    /**
+     * @param string $key
+     * @param array  $data
+     * @param array  $operator
+     *
+     * @return mixed
+     */
     protected function directive(string $key, array $data, array $operator)
     {
         $class = __NAMESPACE__ . '\\Directives\\' . Str::ucFirst($key) . 'Directive';
@@ -402,9 +461,9 @@ class Flow
         if (0 === Str::pos($key, 'end'))
         {
             $key  = Str::sub($key, 3);
-            $data = $this->lexem()->data($key);
+            $data = $this->lexeme()->data($key);
 
-            if (true !== $data && $this->lexem()->closed($key))
+            if (true !== $data && $this->lexeme()->closed($key))
             {
                 $dir = $this->popDirective($key);
 
@@ -430,13 +489,13 @@ class Flow
              * @var Token $_token
              */
             $_token = current($operator['tokens']);
-            $data   = $this->lexem()->data($_token->token);
+            $data   = $this->lexeme()->data($_token->token);
 
             $end = !$this->ifEnd($operator, $_token->token);
 
             if ($end && true !== $data)
             {
-                $data = $this->lexem()->apply(
+                $data = $this->lexeme()->apply(
                     $_token->token,
                     $this->fragment($operator)
                 );
@@ -484,16 +543,16 @@ class Flow
         $this->literals  = $tokens[Lexer::LITERAL];
         $this->printers  = $tokens[Lexer::PRINTER];
         $this->operators = $tokens[Lexer::OPERATOR];
-        $this->raws      = $tokens[Lexer::RAW];
+        $this->rows      = $tokens[Lexer::RAW];
 
         $this->printers($this->printers);
-        $this->printers($this->raws, false);
+        $this->printers($this->rows, false);
         $this->operators();
 
         // check directives
         foreach ($this->directives as $name => $items)
         {
-            if ($this->lexem()->closed($name))
+            if ($this->lexeme()->closed($name))
             {
                 if (!empty($items))
                 {

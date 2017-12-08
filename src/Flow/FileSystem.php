@@ -21,7 +21,7 @@ class FileSystem
     /**
      * FileSystem constructor.
      *
-     * @param Flow $flow
+     * @param Flow   $flow
      * @param string $path
      */
     public function __construct(Flow $flow, string $path)
@@ -37,8 +37,8 @@ class FileSystem
      */
     public function has(string $view): bool
     {
-        $path = $this->get($view);
-        $real = $this->flow->native()->path($view . $this->flow->ext());
+        $path      = $this->get($view);
+        $real      = $this->flow->native()->path($view . $this->flow->ext());
         $directory = \dirname($path);
 
         if ($this->flow->debugMode() || !File::exists($path))
