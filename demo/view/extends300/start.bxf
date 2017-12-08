@@ -2,3 +2,5 @@
 {% set iterator = 1 %}
 
 {%section test%}!{%endsection%}
+
+{%section hello%}Hello{%endsection%}

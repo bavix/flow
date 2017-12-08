@@ -3,7 +3,7 @@
 {% else %}
 
     <h1>{%section test prepend%}
-        Hello, <span>{{ iterator }}</span>
+        {%section hello%}{%endsection%}, <span>{{ iterator }}</span>
     {%endsection%}</h1>
 
     {% dump(new \stdClass) %}
