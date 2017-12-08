@@ -7,6 +7,7 @@ use Bavix\Exceptions\Runtime;
 use Bavix\Flow\Directives\WithDirective;
 use Bavix\FlowNative\FlowNative;
 use Bavix\Helpers\Arr;
+use Bavix\Helpers\JSON;
 use Bavix\Helpers\Str;
 use Bavix\Lexer\Lexer;
 use Bavix\Lexer\Token;
@@ -19,6 +20,11 @@ class Flow
 
     const VER_TIME = 1512748526;
     const VERSION  = '1.0.0-alpha3';
+
+    /**
+     * @var array
+     */
+    protected $cache = [];
 
     /**
      * @var CacheItemPoolInterface
@@ -253,6 +259,42 @@ class Flow
         );
     }
 
+    protected function store(string $key, $data)
+    {
+        if ($pool = $this->pool())
+        {
+            $name = $this->storeName($key);
+            $item = $pool->getItem($name);
+            $item->set($data);
+            $this->cache[$name] = $data;
+            $pool->save($item);
+        }
+
+        return $data;
+    }
+
+    protected function storeName(string $key)
+    {
+        return $key . self::VERSION;
+    }
+
+    protected function storeItem(string $name)
+    {
+        $pool = $this->pool();
+
+        if ($pool && empty($this->cache[$name]))
+        {
+            $item = $pool->getItem($name);
+
+            if ($item->isHit())
+            {
+                $this->cache[$name] = $item->get();
+            }
+        }
+
+        return $this->cache[$name] ?? null;
+    }
+
     /**
      * @param array $data
      *
@@ -260,6 +302,14 @@ class Flow
      */
     public function build(array $data): string
     {
+        $_storeKey = JSON::encode($data);
+        $storeItem = $this->storeItem($_storeKey);
+
+        if ($storeItem)
+        {
+            return $storeItem;
+        }
+
         $code     = [];
         $lastLast = null;
         $last     = null;
@@ -358,7 +408,7 @@ class Flow
             $code[]   = $_token->token;
         }
 
-        return \implode($code);
+        return $this->store($_storeKey, \implode($code));
     }
 
     /**
