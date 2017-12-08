@@ -278,11 +278,16 @@ class Flow
                 throw new Invalid('Undefined object operator `->`!');
             }
 
-            if (Arr::in([T_NEW, T_CLONE, T_INSTANCEOF, T_AS], $_token->type))
+            if (Arr::in([T_NEW, T_CLONE, T_INSTEADOF, T_INSTANCEOF, T_AS], $_token->type))
             {
                 $lastLast = $last;
                 $last     = $_token;
-                $code[]   = ' ';
+
+                if (!Arr::in([T_NEW, T_CLASS], $_token->type))
+                {
+                    $code[]   = ' ';
+                }
+
                 $code[]   = $_token->token;
                 $code[]   = ' ';
                 continue;
@@ -402,11 +407,9 @@ class Flow
 
         foreach ($rows as $row)
         {
-            $this->tpl = \preg_replace(
-                '~' . \preg_quote($row['code'], '~') . '~u',
-                '<?php echo ' . $begin . $this->build($row) . $end . '; ?>',
-                $this->tpl,
-                1
+            $this->tpl = $this->replace(
+                $row['code'],
+                '<?php echo ' . $begin . $this->build($row) . $end . '; ?>'
             );
         }
     }
@@ -454,6 +457,21 @@ class Flow
         return Arr::pop($this->directives[$key]);
     }
 
+    protected function replace(string $fragment, string $code, string $tpl = null)
+    {
+        if (!$tpl)
+        {
+            $tpl = $this->tpl;
+        }
+
+        return \preg_replace(
+            '~' . \preg_quote($fragment, '~') . '~u',
+            $code,
+            $tpl,
+            1
+        );
+    }
+
     /**
      * @param array  $operator
      * @param string $key
@@ -471,11 +489,9 @@ class Flow
             {
                 $dir = $this->popDirective($key);
 
-                $this->tpl = \preg_replace(
-                    '~' . \preg_quote($operator['code'], '~') . '~u',
-                    $dir->endDirective(),
-                    $this->tpl,
-                    1
+                $this->tpl = $this->replace(
+                    $operator['code'],
+                    $dir->endDirective()
                 );
             }
 
@@ -510,11 +526,9 @@ class Flow
                 $directive = $this->directive($_token->token, $data ?: [], $operator);
                 $this->pushDirective($_token->token, $directive);
 
-                $this->tpl = \preg_replace(
-                    '~' . \preg_quote($operator['code'], '~') . '~u',
-                    $directive->render(),
-                    $this->tpl,
-                    1
+                $this->tpl = $this->replace(
+                    $operator['code'],
+                    $directive->render()
                 );
             }
         }
