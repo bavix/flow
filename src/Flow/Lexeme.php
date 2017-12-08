@@ -72,6 +72,11 @@ class Lexeme
     protected $flow;
 
     /**
+     * @var array
+     */
+    protected $cache = [];
+
+    /**
      * Lexeme constructor.
      *
      * @param Flow $flow
@@ -239,6 +244,7 @@ class Lexeme
             $item = $this->getItem($key);
             $item->set($mixed);
             $this->flow->pool()->save($item);
+            $this->cache[$item->getKey()] = $mixed;
         }
     }
 
@@ -259,20 +265,38 @@ class Lexeme
         ]);
     }
 
-    protected function name(string $key)
+    protected function name(string $key): string
     {
-        return \crc32($key) . Flow::VERSION;
+        return \sha1($key) . Flow::VERSION;
+    }
+
+    protected function itemValue($key, $item = null)
+    {
+        if (!$item)
+        {
+            /**
+             * @var CacheItemInterface $item
+             */
+            $item = $this->getItem($key);
+        }
+
+        if ($item->isHit() && empty($this->cache[$item->getKey()]))
+        {
+            $this->cache[$item->getKey()] = $item->get();
+        }
+
+        return $this->cache[$item->getKey()] ?? null;
     }
 
     protected function tryLoad(string $key)
     {
         if (empty($this->data[$key]) && $this->flow->pool())
         {
-            $item = $this->getItem($key);
+            $item = $this->itemValue($key);
 
-            if ($item->isHit())
+            if ($item)
             {
-                $_cache = $item->get();
+                $_cache = $item;
 
                 $this->data[$key]   = $_cache['syntax'];
                 $this->props[$key]  = $_cache['props'];
@@ -296,7 +320,7 @@ class Lexeme
     {
         $syntax = $this->tryLoad($key);
 
-        if (empty($this->data[$key]) || !$syntax)
+        if (empty($this->data[$key]))
         {
             $syntax = $this->syntax($key, $data);
             $this->syntaxStore($key, $syntax);
@@ -426,14 +450,11 @@ class Lexeme
 
         if ($this->flow->pool())
         {
-            /**
-             * @var $item CacheItemInterface
-             */
-            $item = $this->getItem($name);
+            $item = $this->itemValue($name);
 
-            if ($item->isHit())
+            if ($item)
             {
-                return $item->get();
+                return $item;
             }
         }
 

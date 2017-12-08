@@ -1,0 +1,65 @@
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% set help = 1 %}
+{% set help = 2 %}
+{% set help = 3 %}
+{% set help = 4 %}
+{% set help = 5 %}
+{% set help = 6 %}
+{% set help = 7 %}
+
+{% dump(new \stdClass) %}

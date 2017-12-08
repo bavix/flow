@@ -510,10 +510,11 @@ class Flow
                 $directive = $this->directive($_token->token, $data ?: [], $operator);
                 $this->pushDirective($_token->token, $directive);
 
-                $this->tpl = \str_replace(
-                    $operator['code'],
+                $this->tpl = \preg_replace(
+                    '~' . \preg_quote($operator['code'], '~') . '~u',
                     $directive->render(),
-                    $this->tpl
+                    $this->tpl,
+                    1
                 );
             }
         }
