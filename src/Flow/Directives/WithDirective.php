@@ -11,9 +11,20 @@ class WithDirective extends Directive
     protected static $index   = 0;
     protected static $storage = [];
 
+    protected static function calc()
+    {
+        static::$index     = \count(static::$storage) - 1;
+    }
+
     public static function &last()
     {
         return static::$storage[static::$index];
+    }
+
+    public static function pushObject($data)
+    {
+        static::$storage[] = $data;
+        static::$index     = \count(static::$storage) - 1;
     }
 
     public static function push(&$data)

@@ -349,7 +349,7 @@ class Flow
                             T_NS_SEPARATOR
                         ], $last->type)))
                 {
-                    $_token->token = '$' . $_token->token;
+                    $_token->token = '$this->' . $_token->token;
                 }
             }
 

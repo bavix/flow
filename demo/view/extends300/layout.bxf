@@ -1,0 +1,7 @@
+<span>{{ iterator++ }} </span>
+
+{% if iterator < 300 %}
+    {% extends 'extends300:layout' %}
+{% else %}
+    {% dump(new \stdClass) %}
+{% endif %}

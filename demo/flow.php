@@ -12,7 +12,7 @@ $flow   = new \Bavix\Flow\Flow($native, [
     'compile'    => __DIR__ . '/compile',
     'cache'      => $pool,
     'debug'      => true,
-    'minify'     => true,
+    'minify'     => false,
     'lexemes'    => [
         __DIR__ . '/lexemes',
     ],

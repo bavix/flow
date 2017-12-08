@@ -50,18 +50,18 @@ class ForDirective extends Directive
         return '<?php ' . $init . 'if (!empty(' . $rows . ')):' .
             '\Bavix\Flow\Directives\ForDirective::loop(\'' . $loop . '\', ' . $rows . ');' .
             'foreach (' . $rows . ' as ' . $key . ' => ' . $row . '): ' .
-            '$loop = \Bavix\Flow\Directives\ForDirective::loop(\'' . $loop . '\');' .
-            '$loop->next(' . $key . ');?>';
+            '$this->loop = \Bavix\Flow\Directives\ForDirective::loop(\'' . $loop . '\');' .
+            '$this->loop->next(' . $key . ');?>';
     }
 
     public function endDirective(): string
     {
         if (Arr::pop(static::$for) === static::T_ELSE)
         {
-            return '<?php unset($loop); endif; ?>';
+            return '<?php unset($this->loop); endif; ?>';
         }
 
-        return '<?php unset($loop); endforeach; endif; ?>';
+        return '<?php unset($this->loop); endforeach; endif; ?>';
     }
 
 }
