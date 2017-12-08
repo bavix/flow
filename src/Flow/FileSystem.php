@@ -14,6 +14,11 @@ class FileSystem
     protected $flow;
 
     /**
+     * @var string[]
+     */
+    protected $paths = [];
+
+    /**
      * @var string
      */
     protected $path;
@@ -41,7 +46,7 @@ class FileSystem
         $real      = $this->flow->native()->path($view . $this->flow->ext());
         $directory = \dirname($path);
 
-        if ($this->flow->debugMode() || !File::exists($path))
+        if (empty($this->paths[$view]) && ($this->flow->debugMode() || !File::exists($path)))
         {
             Dir::make($directory);
 
@@ -57,6 +62,8 @@ class FileSystem
      */
     public function set(string $view, string $data)
     {
+        $this->paths[$view] = true;
+
         \file_put_contents(
             $this->get($view),
             $data

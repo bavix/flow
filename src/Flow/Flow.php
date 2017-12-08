@@ -259,14 +259,13 @@ class Flow
         );
     }
 
-    protected function store(string $key, $data)
+    protected function store(string $name, $data)
     {
         if ($pool = $this->pool())
         {
-            $name = $this->storeName($key);
             $item = $pool->getItem($name);
-            $item->set($data);
             $this->cache[$name] = $data;
+            $item->set($data);
             $pool->save($item);
         }
 
