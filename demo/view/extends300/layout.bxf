@@ -1,7 +1,11 @@
-<span>{{ iterator++ }} </span>
-
-{% if iterator < 300 %}
+{% if ++iterator < 300 %}
     {% extends 'extends300:layout' %}
 {% else %}
+
+    <h1>{%section test prepend%}
+        Hello, <span>{{ iterator }}</span>
+    {%endsection%}</h1>
+
     {% dump(new \stdClass) %}
+
 {% endif %}

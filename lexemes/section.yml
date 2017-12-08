@@ -1,6 +1,6 @@
 closed: true
 
 syntax:
-  - '{{ name }}'
   - '{{ name }} (?<type>append)'
   - '{{ name }} (?<type>prepend)'
+  - '{{ name }}'
