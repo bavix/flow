@@ -3,8 +3,10 @@
 namespace Bavix\Flow;
 
 use Bavix\Helpers\Arr;
+use Bavix\Helpers\JSON;
 use Bavix\Lexer\Lexer;
 use Bavix\SDK\FileLoader;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Class Lexem
@@ -71,6 +73,11 @@ class Lexem
     protected $flow;
 
     /**
+     * @var CacheItemPoolInterface
+     */
+    protected $pool;
+
+    /**
      * Lexem constructor.
      *
      * @param Flow $flow
@@ -79,6 +86,18 @@ class Lexem
     {
         $this->addFolder(\dirname(__DIR__, 2) . '/lexemes');
         $this->flow = $flow;
+    }
+
+    /**
+     * @param CacheItemPoolInterface $pool
+     *
+     * @return $this
+     */
+    public function setPool(CacheItemPoolInterface $pool): self
+    {
+        $this->pool = $pool;
+
+        return $this;
     }
 
     /**
@@ -208,6 +227,52 @@ class Lexem
     }
 
     /**
+     * @param string $name
+     * @param array  $syntax
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function store(string $name, array $syntax)
+    {
+        if ($this->pool)
+        {
+            $item = $this->pool->getItem($name);
+            $item->set($syntax);
+            $this->pool->save($item);
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param array  $data
+     *
+     * @return array|mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function getLexemes(string $key, array $data)
+    {
+        $name = $key . JSON::encode($data);
+
+        if ($this->pool)
+        {
+            $item = $this->pool->getItem($name);
+
+            if ($item->isHit())
+            {
+                $syntax = $item->get();
+            }
+        }
+
+        if (empty($syntax))
+        {
+            $syntax = $this->syntax($key, $data);
+            $this->store($name, $syntax);
+        }
+
+        return $syntax;
+    }
+
+    /**
      * @param string $key
      * @param array  $data
      *
@@ -254,15 +319,16 @@ class Lexem
     }
 
     /**
-     * @param string $key
-     * @param array  $data
+     * @param string     $key
+     * @param array|null $data
      *
-     * @return array|bool
+     * @return array|bool|mixed
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function get(string $key, array $data = null)
     {
         /**
-         * @var $loader FileLoader\DataInterface
+         * @var $loader mixed
          */
         $loader = $this->loader($key) ?: $data;
 
@@ -271,12 +337,21 @@ class Lexem
             return true;
         }
 
-        return $this->syntax(
-            $key,
-            (\is_array($loader) ?
-                $loader :
-                $loader->asArray()) ?: []
-        );
+        $mixed = [];
+
+        if ($loader)
+        {
+            $mixed = $loader;
+
+            if (\is_object($mixed))
+            {
+                $mixed = $loader->asArray();
+            }
+        }
+
+        $mixed['version'] = Flow::VERSION;
+
+        return $this->getLexemes($key, $mixed);
     }
 
     /**
@@ -286,7 +361,7 @@ class Lexem
      */
     public function closed(string $key): bool
     {
-        $this->get($key);
+        $this->data($key);
 
         return $this->closed[$key] ?? false;
     }

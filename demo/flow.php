@@ -12,7 +12,14 @@ $flow  = new \Bavix\Flow\Flow($native, [
     ]
 ]);
 
-$flow->lexem()->addFolder(__DIR__ . '/lexemes');
+$pool = new \Stash\Pool();
+$pool->setDriver(new \Stash\Driver\FileSystem([
+    'path' => __DIR__ . '/cache/__stash__'
+]));
+
+$lexem = $flow->lexem();
+$lexem->setPool($pool);
+$lexem->addFolder(__DIR__ . '/lexemes');
 
 $native->addFolder('bar', __DIR__ . '/view/bar');
 $native->addFolder('foo', __DIR__ . '/view/foo');

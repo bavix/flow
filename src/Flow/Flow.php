@@ -295,12 +295,12 @@ class Flow
                 }
 
                 if (!Arr::in([T_FUNCTION, T_CLASS], $_token->type) &&
-                    (!$last || (
-                            $last->type !== Validator::T_ENDARRAY &&
-                            $last->type !== Validator::T_ENDBRACKET &&
-                            $last->type !== Validator::T_DOT &&
-                            $last->type !== T_NS_SEPARATOR
-                        )))
+                    (!$last || !Arr::in([
+                            Validator::T_ENDBRACKET,
+                            Validator::T_ENDARRAY,
+                            Validator::T_DOT,
+                            T_NS_SEPARATOR
+                        ], $last->type)))
                 {
                     $_token->token = '$' . $_token->token;
                 }
@@ -339,16 +339,16 @@ class Flow
         return $this->fileSystem->get($view);
     }
 
-    protected function printers(array $raws, $escape = true)
+    protected function printers(array $rows, $escape = true)
     {
         $begin = $escape ? '\\htmlspecialchars(' : '';
         $end   = $escape ? ', ENT_QUOTES, \'UTF-8\')' : '';
 
-        foreach ($raws as $raw)
+        foreach ($rows as $row)
         {
             $this->tpl = \preg_replace(
-                '~' . \preg_quote($raw['code'], '~') . '~u',
-                '<?php echo ' . $begin . $this->build($raw) . $end . '; ?>',
+                '~' . \preg_quote($row['code'], '~') . '~u',
+                '<?php echo ' . $begin . $this->build($row) . $end . '; ?>',
                 $this->tpl,
                 1
             );
