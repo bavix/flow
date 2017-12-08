@@ -235,11 +235,39 @@ class Lexem
             $item = $this->pool->getItem($name);
             $item->set([
                 'syntax' => $syntax,
-                'closed' => $this->closed($key),
+                'props' => $this->props[$key] ?? null,
+                'closed' => $this->closed[$key] ?? false,
             ]);
 
             $this->pool->save($item);
         }
+    }
+
+    protected function name(string $key)
+    {
+        return $key . Flow::VERSION;
+    }
+
+    protected function tryLoad(string $key)
+    {
+        if ($this->pool && empty($this->data[$key]))
+        {
+            $item = $this->pool->getItem(
+                $this->name($key)
+            );
+
+            if ($item->isHit())
+            {
+                $_cache = $item->get();
+                $this->data[$key] = $_cache['syntax'];
+                $this->props[$key] = $_cache['props'];
+                $this->closed[$key] = $_cache['closed'];
+
+                return $this->data[$key];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -251,23 +279,11 @@ class Lexem
      */
     protected function getLexemes(string $key, array $data)
     {
-        $name = $key . JSON::encode($data);
+        $syntax = $this->tryLoad($key);
 
-        if ($this->pool)
+        if (empty($this->data[$key]) || !$syntax)
         {
-            $item = $this->pool->getItem($name);
-
-            if ($item->isHit())
-            {
-                $_cache = $item->get();
-                $syntax = $_cache['syntax'];
-
-                $this->closed[$key] = $_cache['closed'];
-            }
-        }
-
-        if (empty($syntax))
-        {
+            $name = $this->name($key);
             $syntax = $this->syntax($key, $data);
             $this->store($key, $name, $syntax);
         }
@@ -352,8 +368,6 @@ class Lexem
             }
         }
 
-        $mixed['version'] = Flow::VERSION;
-
         return $this->getLexemes($key, $mixed);
     }
 
@@ -379,6 +393,7 @@ class Lexem
     {
         if (!\array_key_exists($key, $this->data))
         {
+            $this->tryLoad($key);
             $this->data[$key] = $this->get($key, $data);
         }
 

@@ -17,6 +17,8 @@ $pool->setDriver(new \Stash\Driver\FileSystem([
     'path' => __DIR__ . '/cache/__stash__'
 ]));
 
+//$pool->clear();die;
+
 $lexem = $flow->lexem();
 $lexem->setPool($pool);
 $lexem->addFolder(__DIR__ . '/lexemes');
