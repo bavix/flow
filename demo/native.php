@@ -9,7 +9,7 @@ $helper->add('hello', function ($name) {
     return "Hello, {$name}";
 });
 
-$native->addFolder('app', __DIR__ . '/flow');
+$native->addFolder('app', __DIR__ . '/view/native');
 
 echo $native->render('app:welcome.php', [
     'engine' => 'Flow Native'

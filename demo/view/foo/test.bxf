@@ -1,4 +1,4 @@
-{%extends 'app:layout'%}
+{%extends 'bar:layout'%}
 
 {%section hello%}
     {% with user %}

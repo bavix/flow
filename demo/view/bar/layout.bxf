@@ -7,5 +7,5 @@
 
 {%section hello%}{%endsection%}
 
-{% include 'app:test2' %}
-{% partial 'app:test' %}
+{% include 'foo:test2' %}
+{% partial 'foo:test' %}

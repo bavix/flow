@@ -9,7 +9,7 @@ $flow  = new \Bavix\Flow\Flow($native, [
     'debug' => true
 ]);
 
-$native->addFolder('app', __DIR__ . '/app');
+$native->addFolder('app', __DIR__ . '/view/app');
 
 $helper->add('substr', '\mb_substr');
 $helper->add('range', '\range');

@@ -25,7 +25,8 @@ $flow  = new \Bavix\Flow\Flow($native, [
 
 $flow->lexem()->addFolder(__DIR__ . '/lexemes');
 
-$native->addFolder('app', __DIR__ . '/app');
+$native->addFolder('bar', __DIR__ . '/view/bar');
+$native->addFolder('foo', __DIR__ . '/view/foo');
 
 class User implements ArrayAccess
 {
@@ -87,4 +88,4 @@ $args = [
 
 //var_dump($args['user']->images());die;
 
-echo $flow->render('app:test', $args);
+echo $flow->render('foo:test', $args);
