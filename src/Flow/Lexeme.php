@@ -5,13 +5,14 @@ namespace Bavix\Flow;
 use Bavix\Helpers\Arr;
 use Bavix\Lexer\Lexer;
 use Bavix\SDK\FileLoader;
+use Psr\Cache\CacheItemInterface;
 
 /**
- * Class Lexem
+ * Class Lexeme
  *
  * @package Bavix\Flow
  */
-class Lexem
+class Lexeme
 {
 
     /**
@@ -51,9 +52,9 @@ class Lexem
     protected $closed = [];
 
     /**
-     * @var Lexer
+     * @var array
      */
-    protected $lexer;
+    protected $items = [];
 
     /**
      * @var string[]
@@ -61,9 +62,9 @@ class Lexem
     protected $folders = [];
 
     /**
-     * @var string
+     * @var Lexer
      */
-    protected $root;
+    protected $lexer;
 
     /**
      * @var Flow
@@ -71,7 +72,7 @@ class Lexem
     protected $flow;
 
     /**
-     * Lexem constructor.
+     * Lexeme constructor.
      *
      * @param Flow $flow
      */
@@ -123,7 +124,7 @@ class Lexem
                 }
                 catch (\Throwable $throwable)
                 {
-
+                    // skip...
                 }
             }
         }
@@ -209,6 +210,103 @@ class Lexem
 
     /**
      * @param string $key
+     *
+     * @return mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function getItem(string $key)
+    {
+        $name = $this->name($key);
+
+        if (empty($this->items[$name]))
+        {
+            $this->items[$name] = $this->flow->pool()->getItem($name);
+        }
+
+        return $this->items[$name];
+    }
+
+    /**
+     * @param string $key
+     * @param array  $mixed
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function store(string $key, array $mixed)
+    {
+        if ($this->flow->pool())
+        {
+            $item = $this->getItem($key);
+            $item->set($mixed);
+            $this->flow->pool()->save($item);
+        }
+    }
+
+    /**
+     * @param string $key
+     * @param array  $syntax
+     *
+     * @return void
+     *
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function syntaxStore(string $key, array $syntax)
+    {
+        $this->store($key, [
+            'syntax' => $syntax,
+            'props'  => $this->props[$key] ?? null,
+            'closed' => $this->closed[$key] ?? false,
+        ]);
+    }
+
+    protected function name(string $key)
+    {
+        return \crc32($key) . Flow::VERSION;
+    }
+
+    protected function tryLoad(string $key)
+    {
+        if (empty($this->data[$key]) && $this->flow->pool())
+        {
+            $item = $this->getItem($key);
+
+            if ($item->isHit())
+            {
+                $_cache = $item->get();
+
+                $this->data[$key]   = $_cache['syntax'];
+                $this->props[$key]  = $_cache['props'];
+                $this->closed[$key] = $_cache['closed'];
+
+                return $this->data[$key];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $key
+     * @param array  $data
+     *
+     * @return array|mixed
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
+    protected function getLexemes(string $key, array $data)
+    {
+        $syntax = $this->tryLoad($key);
+
+        if (empty($this->data[$key]) || !$syntax)
+        {
+            $syntax = $this->syntax($key, $data);
+            $this->syntaxStore($key, $syntax);
+        }
+
+        return $syntax;
+    }
+
+    /**
+     * @param string $key
      * @param array  $data
      *
      * @return array
@@ -254,15 +352,16 @@ class Lexem
     }
 
     /**
-     * @param string $key
-     * @param array  $data
+     * @param string     $key
+     * @param array|null $data
      *
-     * @return array|bool
+     * @return array|bool|mixed
+     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function get(string $key, array $data = null)
     {
         /**
-         * @var $loader FileLoader\DataInterface
+         * @var $loader mixed
          */
         $loader = $this->loader($key) ?: $data;
 
@@ -271,12 +370,19 @@ class Lexem
             return true;
         }
 
-        return $this->syntax(
-            $key,
-            (\is_array($loader) ?
-                $loader :
-                $loader->asArray()) ?: []
-        );
+        $mixed = [];
+
+        if ($loader)
+        {
+            $mixed = $loader;
+
+            if (\is_object($mixed))
+            {
+                $mixed = $loader->asArray();
+            }
+        }
+
+        return $this->getLexemes($key, $mixed);
     }
 
     /**
@@ -286,7 +392,7 @@ class Lexem
      */
     public function closed(string $key): bool
     {
-        $this->get($key);
+        $this->data($key);
 
         return $this->closed[$key] ?? false;
     }
@@ -299,12 +405,50 @@ class Lexem
      */
     public function data(string $key, array $data = null)
     {
+        $this->tryLoad($key);
+
         if (!\array_key_exists($key, $this->data))
         {
             $this->data[$key] = $this->get($key, $data);
         }
 
         return $this->data[$key];
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return array
+     */
+    public function lexerApply(string $value): array
+    {
+        $name = __FUNCTION__ . $value;
+
+        if ($this->flow->pool())
+        {
+            /**
+             * @var $item CacheItemInterface
+             */
+            $item = $this->getItem($name);
+
+            if ($item->isHit())
+            {
+                return $item->get();
+            }
+        }
+
+        $value  = '{{ ' . $value . ' }}';
+        $tokens = $this->flow->lexer()->tokens($value);
+        $_lexer = \current($tokens[Lexer::PRINTER]);
+
+        $store = [
+            'lexer' => $_lexer,
+            'code'  => $this->flow->build($_lexer)
+        ];
+
+        $this->store($name, $store);
+
+        return $store;
     }
 
     /**
@@ -323,9 +467,6 @@ class Lexem
             return $data;
         }
 
-        $lexer = new Lexer();
-        $flow  = $this->flow;
-
         foreach ($lexData as $datum)
         {
             if (\preg_match($datum['regexp'], $tpl, $outs))
@@ -334,17 +475,7 @@ class Lexem
                     return \is_string(\end($args));
                 });
 
-                $data = Arr::map($data, function ($value) use ($lexer, $flow) {
-                    $value  = '{{ ' . $value . ' }}';
-                    $tokens = $lexer->tokens($value);
-                    $_lexer = \current($tokens[Lexer::PRINTER]);
-
-                    return [
-                        'lexer' => $_lexer,
-                        'code'  => $flow->build($_lexer)
-                    ];
-                });
-
+                $data = Arr::map($data, [$this, 'lexerApply']);
                 break;
             }
         }

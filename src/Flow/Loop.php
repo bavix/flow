@@ -1,6 +1,7 @@
 <?php
 
 namespace Bavix\Flow;
+
 use Bavix\Exceptions\Invalid;
 
 /**
@@ -20,7 +21,7 @@ class Loop
 {
 
     protected $iteration = 0;
-    protected $index = -1;
+    protected $index     = -1;
     protected $key;
 
     protected $first;

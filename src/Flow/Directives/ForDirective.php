@@ -9,7 +9,7 @@ use Bavix\Helpers\Arr;
 class ForDirective extends Directive
 {
 
-    const T_END = 1;
+    const T_END  = 1;
     const T_ELSE = 2;
 
     protected static $for   = [];

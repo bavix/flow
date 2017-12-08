@@ -7,8 +7,8 @@ $native = new \Bavix\Flow\Native();
 $native->addFolder('r20', __DIR__ . '/view/r20');
 
 $flow = new \Bavix\Flow\Flow($native, [
-    'cache' => __DIR__ . '/cache',
-    'debug' => true
+    'compile' => __DIR__ . '/compile',
+    'debug'   => true
 ]);
 
 echo $flow->render('r20:layout');
