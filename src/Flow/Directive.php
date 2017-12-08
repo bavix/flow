@@ -37,6 +37,9 @@ abstract class Directive
         $this->operator = $operator;
     }
 
+    /**
+     * @return string
+     */
     protected function randVariable(): string
     {
         return '$_' . Str::random(16);
