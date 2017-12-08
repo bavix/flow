@@ -12,8 +12,7 @@ include_once dirname(__DIR__) . '/vendor/autoload.php';
     }
 });
 
-$helper = new \Bavix\FlowNative\Helper();
-$native = new \Bavix\Flow\Native($helper);
+$native = new \Bavix\Flow\Native();
 $flow  = new \Bavix\Flow\Flow($native, [
     'cache' => __DIR__ . '/cache',
     'debug' => true,

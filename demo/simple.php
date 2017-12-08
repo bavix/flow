@@ -2,8 +2,7 @@
 
 include_once dirname(__DIR__) . '/vendor/autoload.php';
 
-$helper = new \Bavix\FlowNative\Helper();
-$native = new \Bavix\Flow\Native($helper);
+$native = new \Bavix\Flow\Native();
 $flow  = new \Bavix\Flow\Flow($native, [
     'cache' => __DIR__ . '/cache',
     'debug' => true
@@ -11,14 +10,11 @@ $flow  = new \Bavix\Flow\Flow($native, [
 
 $native->addFolder('app', __DIR__ . '/view/app');
 
-$helper->add('substr', '\mb_substr');
-$helper->add('range', '\range');
-
 $args = [
     'help' => __FILE__,
 ];
 
-if (\random_int(0, 1))
+if (1 === \Bavix\Helpers\Num::randomInt(0, 1))
 {
     $args['items'] = (function () {
         foreach (\range(1, 100) as $item)

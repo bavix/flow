@@ -9,7 +9,7 @@
     {% endwith %}
 {% endif %}
 
-<h1>{{ substr(help, begin, end) }}</h1>
+<h1>{{ substring(help, begin, end) }}</h1>
 
 {% json(items) %}
 

@@ -2,12 +2,7 @@
 
 include_once dirname(__DIR__) . '/vendor/autoload.php';
 
-$helper = new Bavix\FlowNative\Helper();
-$native = new \Bavix\Flow\Native($helper);
-
-$helper->add('hello', function ($name) {
-    return "Hello, {$name}";
-});
+$native = new \Bavix\Flow\Native();
 
 $native->addFolder('app', __DIR__ . '/view/native');
 
