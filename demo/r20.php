@@ -8,7 +8,9 @@ $native->addFolder('r20', __DIR__ . '/view/r20');
 
 $flow = new \Bavix\Flow\Flow($native, [
     'compile' => __DIR__ . '/compile',
-    'debug'   => true
+    'minify' => true,
+    'inline' => true,
+    'debug' => true,
 ]);
 
 echo $flow->render('r20:layout');

@@ -1,12 +1,18 @@
-{% use Bavix\Lexer\Validator as MyClass %}
-{% set myClass = MyClass::class %}
-
-{% include('r20:default', true, [
-    'false' => false,
-    'true' => null,
-    'const1' => JSON_PRETTY_PRINT,
-    'const2' => Validator::class,
-    'const3' => __NAMESPACE__
-    'class1' => new MyClass(myClass),
-    'class2' => new myClass,
-]) %}
+{% use Bavix\Lexer\Validator as MyClass %}{% set myClass = MyClass::class %}<!DOCTYPE html>
+<html>
+    <head>
+        <title>r20</title>
+        <meta charset="{{charset ?? 'utf-8'}}"/>
+    </head>
+    <body>
+        {% include('r20:default', true, [
+            'false' => false,
+            'true' => null,
+            'const1' => JSON_PRETTY_PRINT,
+            'const2' => Validator::class,
+            'const3' => __NAMESPACE__
+            'class1' => new MyClass(myClass),
+            'class2' => new myClass,
+        ]) %}
+    </body>
+</html>

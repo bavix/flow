@@ -121,6 +121,11 @@ class Flow
     protected $minify;
 
     /**
+     * @var bool
+     */
+    protected $inline;
+
+    /**
      * Flow constructor.
      *
      * @param Native $native
@@ -132,6 +137,7 @@ class Flow
         $this->mapDirectives = $options['directives'] ?? [];
         $this->lexemes       = $options['lexemes'] ?? [];
         $this->minify        = $options['minify'] ?? false;
+        $this->inline        = $options['inline'] ?? false;
         $this->debug         = $options['debug'] ?? false;
         $this->pool          = $options['cache'] ?? null;
 
@@ -421,10 +427,15 @@ class Flow
 
         if ($this->minify)
         {
-            $html = \Minify_HTML::minify($html, [
+            $html = \Minify_HTML::minify(\trim($html), [
                 'cssMinifier' => [\Minify_CSSmin::class, 'minify'],
                 'jsMinifier'  => [JSMin::class, 'minify'],
             ]);
+        }
+
+        if ($this->inline)
+        {
+            $html = \preg_replace("~[ \t\n\r\x0B]+~u", ' ', $html);
         }
 
         return $html;
