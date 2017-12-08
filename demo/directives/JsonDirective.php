@@ -1,6 +1,6 @@
 <?php
 
-namespace Bavix\Flow\Directives;
+namespace Demo\Directives;
 
 use Bavix\Flow\Directive;
 
