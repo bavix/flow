@@ -55,6 +55,11 @@ class Lexem
     protected $lexer;
 
     /**
+     * @var string[]
+     */
+    protected $folders = [];
+
+    /**
      * @var string
      */
     protected $root;
@@ -68,17 +73,23 @@ class Lexem
      * Lexem constructor.
      *
      * @param Flow $flow
-     * @param string $root
      */
-    public function __construct(Flow $flow, string $root = null)
+    public function __construct(Flow $flow)
     {
-        if (!$root)
-        {
-            $root = \dirname(__DIR__, 2);
-        }
+        $this->addFolder(\dirname(__DIR__, 2) . '/lexemes');
+        $this->flow      = $flow;
+    }
 
-        $this->root = $root . '/lexemes';
-        $this->flow = $flow;
+    /**
+     * @param string $path
+     *
+     * @return self
+     */
+    public function addFolder(string $path): self
+    {
+        $this->folders[] = $path;
+
+        return $this;
     }
 
     /**
@@ -101,15 +112,18 @@ class Lexem
      */
     protected function loader($file)
     {
-        foreach (FileLoader::extensions() as $ext)
+        foreach ($this->folders as $folder)
         {
-            try
+            foreach (FileLoader::extensions() as $ext)
             {
-                return FileLoader::load($file . '.' . $ext);
-            }
-            catch (\Throwable $throwable)
-            {
+                try
+                {
+                    return FileLoader::load($folder . '/' . $file . '.' . $ext);
+                }
+                catch (\Throwable $throwable)
+                {
 
+                }
             }
         }
 
@@ -249,8 +263,7 @@ class Lexem
         /**
          * @var $loader FileLoader\DataInterface
          */
-        $path   = $this->root . '/' . $key;
-        $loader = $this->loader($path)?:$data;
+        $loader = $this->loader($key) ?: $data;
 
         if (null === $loader)
         {

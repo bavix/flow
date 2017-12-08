@@ -1,0 +1,8 @@
+properties:
+  args:
+    types:
+      - any
+
+syntax:
+  - '\({{ args }}\)'
+  - '{{ args }}'

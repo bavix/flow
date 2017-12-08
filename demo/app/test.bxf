@@ -8,7 +8,7 @@
 
             {% for image in .['images']() %}
 
-                {% dump (loop, image) %}
+                {% dump(loop, image) %}
 
                 {% with image %}
                     {% set .path = 'http://via.placeholder.com/450x150' %}

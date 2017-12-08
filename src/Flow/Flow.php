@@ -113,10 +113,58 @@ class Flow
 
         // init
         $this->native     = $native;
-        $this->lexer      = new Lexer();
-        $this->lexem      = new Lexem($this);
         $this->fileSystem = new FileSystem($this, $options['cache']);
         $this->native->setFlow($this);
+    }
+
+    /**
+     * @param Lexem $lexem
+     *
+     * @return $this
+     */
+    public function setLexem(Lexem $lexem): self
+    {
+        $this->lexem = $lexem;
+
+        return $this;
+    }
+
+    /**
+     * @param Lexer $lexer
+     *
+     * @return $this
+     */
+    public function setLexer(Lexer $lexer): self
+    {
+        $this->lexer = $lexer;
+
+        return $this;
+    }
+
+    /**
+     * @return Lexem
+     */
+    public function lexem(): Lexem
+    {
+        if (!$this->lexem)
+        {
+            $this->lexem = new Lexem($this);
+        }
+        
+        return $this->lexem;
+    }
+
+    /**
+     * @return Lexer
+     */
+    public function lexer(): Lexer
+    {
+        if (!$this->lexer)
+        {
+            $this->lexer = new Lexer();
+        }
+        
+        return $this->lexer;
     }
 
     public function debugMode()
@@ -335,9 +383,9 @@ class Flow
         if (0 === Str::pos($key, 'end'))
         {
             $key  = Str::sub($key, 3);
-            $data = $this->lexem->data($key);
+            $data = $this->lexem()->data($key);
 
-            if (true !== $data && $this->lexem->closed($key))
+            if (true !== $data && $this->lexem()->closed($key))
             {
                 $dir = $this->popDirective($key);
 
@@ -363,13 +411,13 @@ class Flow
              * @var Token $_token
              */
             $_token = current($operator['tokens']);
-            $data   = $this->lexem->data($_token->token);
+            $data   = $this->lexem()->data($_token->token);
 
             $end = !$this->ifEnd($operator, $_token->token);
 
             if ($end && true !== $data)
             {
-                $data = $this->lexem->apply(
+                $data = $this->lexem()->apply(
                     $_token->token,
                     $this->fragment($operator)
                 );
@@ -412,7 +460,7 @@ class Flow
     {
         $path      = $this->native->path($view . $this->ext());
         $this->tpl = \file_get_contents($path);
-        $tokens    = $this->lexer->tokens($this->tpl);
+        $tokens    = $this->lexer()->tokens($this->tpl);
 
         $this->literals  = $tokens[Lexer::LITERAL];
         $this->printers  = $tokens[Lexer::PRINTER];
@@ -426,7 +474,7 @@ class Flow
         // check directives
         foreach ($this->directives as $name => $items)
         {
-            if ($this->lexem->closed($name))
+            if ($this->lexem()->closed($name))
             {
                 if (!empty($items))
                 {

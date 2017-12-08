@@ -2,14 +2,28 @@
 
 include_once dirname(__DIR__) . '/vendor/autoload.php';
 
+\spl_autoload_register(function ($class) {
+    if (0 === \Bavix\Helpers\Str::pos($class, 'Demo\\Directives\\'))
+    {
+        $ns = explode('\\', $class);
+        $class = array_pop($ns);
+
+        require __DIR__ . '/directives/' . $class . '.php';
+    }
+});
+
 $helper = new \Bavix\FlowNative\Helper();
 $native = new \Bavix\Flow\Native($helper);
 $flow  = new \Bavix\Flow\Flow($native, [
     'cache' => __DIR__ . '/cache',
     'debug' => true,
-//    'minify' => true
+    'minify' => true,
+    'directives' => [
+        'll' => Demo\Directives\LlDirective::class
+    ]
 ]);
 
+$flow->lexem()->addFolder(__DIR__ . '/lexemes');
 
 $native->addFolder('app', __DIR__ . '/app');
 
@@ -64,7 +78,11 @@ $args = [
         'cars' => function () {
             return [];
         }
-    ])
+    ]),
+    'menu' => [
+        '<a href="/flow.php">Home</a>',
+        '<a href="/simple.php">Simple</a>',
+    ]
 ];
 
 //var_dump($args['user']->images());die;
