@@ -236,7 +236,7 @@ class Flow
                 continue;
             }
 
-            if ($_token->type === T_INSTANCEOF)
+            if (Arr::in([T_INSTANCEOF, T_AS], $_token->type))
             {
                 $lastLast = $last;
                 $last     = $_token;
