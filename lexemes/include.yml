@@ -4,6 +4,18 @@ properties:
       - variable
       - ternary
 
+  options:
+    types:
+      - variable
+      - callable
+      - array
+
+  sandbox:
+    types:
+      - bool
+
 syntax:
+  - '\({{ path }}, {{ sandbox }}, {{ options }}\)'
+  - '\({{ path }}, {{ options }}\)'
+  - '\({{ path }}\)'
   - '{{ path }}'
-  - 'file={{ path }}'

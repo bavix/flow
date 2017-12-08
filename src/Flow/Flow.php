@@ -65,7 +65,10 @@ class Flow
     protected $functions = [
         'empty',
         'isset',
-        'unset'
+        'unset',
+
+        'compact',
+        'extract',
     ];
 
     /**
@@ -224,6 +227,15 @@ class Flow
                 throw new Invalid('Undefined object operator `->`!');
             }
 
+            if (Arr::in([T_NEW, T_CLONE], $_token->type))
+            {
+                $lastLast = $last;
+                $last     = $_token;
+                $code[]   = $_token->token;
+                $code[]   = ' ';
+                continue;
+            }
+
             if ($_token->type === T_INSTANCEOF)
             {
                 $lastLast = $last;
@@ -252,7 +264,8 @@ class Flow
 
             if ((!$last || ($last && $last->type !== Validator::T_DOT)) && $_token->type === T_FUNCTION)
             {
-                if (!Arr::in($this->functions, $_token->token))
+                if (Str::ucFirst($_token->token) !== $_token->token &&
+                    !Arr::in($this->functions, $_token->token))
                 {
                     $_token->token = '$this->' . $_token->token;
                 }
@@ -276,7 +289,13 @@ class Flow
                     Arr::push($code, '->');
                 }
 
-                if ($_token->type !== T_FUNCTION && (!$last || (
+                if (Str::ucFirst($_token->token) === $_token->token)
+                {
+                    $_token->type = T_CLASS;
+                }
+
+                if (!Arr::in([T_FUNCTION, T_CLASS], $_token->type) &&
+                    (!$last || (
                             $last->type !== Validator::T_ENDARRAY &&
                             $last->type !== Validator::T_ENDBRACKET &&
                             $last->type !== Validator::T_DOT &&
@@ -322,8 +341,8 @@ class Flow
 
     protected function printers(array $raws, $escape = true)
     {
-        $begin = $escape ? '\\htmlentities(' : '';
-        $end   = $escape ? ')' : '';
+        $begin = $escape ? '\\htmlspecialchars(' : '';
+        $end   = $escape ? ', ENT_QUOTES, \'UTF-8\')' : '';
 
         foreach ($raws as $raw)
         {

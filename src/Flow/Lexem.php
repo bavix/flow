@@ -22,6 +22,7 @@ class Lexem
         'variable' => '[\w\'":.\[\]()\s]+',
         'array'    => '(array\(|\[)[\s\S]*(\]|\))',
         'ternary'  => '\X+\?\X*:\X+',
+        'bool'     => '\s*(true|false)\s*',
         'any'      => '\X+',
     ];
 
@@ -77,7 +78,7 @@ class Lexem
     public function __construct(Flow $flow)
     {
         $this->addFolder(\dirname(__DIR__, 2) . '/lexemes');
-        $this->flow      = $flow;
+        $this->flow = $flow;
     }
 
     /**
@@ -87,7 +88,7 @@ class Lexem
      */
     public function addFolder(string $path): self
     {
-        $this->folders[] = $path;
+        Arr::unShift($this->folders, $path);
 
         return $this;
     }

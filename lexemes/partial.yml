@@ -6,4 +6,4 @@ properties:
 
 syntax:
   - '{{ path }}'
-  - 'file={{ path }}'
+  - '\({{ path }}\)'

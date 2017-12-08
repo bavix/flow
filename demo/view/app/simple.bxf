@@ -15,22 +15,21 @@
 
 {%if !(items instanceof \Generator) %}
 
-    <br />
+    {%literal%}
+        <style>
+            span {color: blue}
+            span:nth-child(2) {color: red}
+        </style>
+    {%endliteral%}
 
-    {% for item in items %}
-        {{ item }} -
-        {% if (item % 3 === 0) %}Fizz{%endif%}
-        {% if (item % 5 === 0) %}Bazz{%endif%}
-        <br />
-    {%forelse%}
-
+    <ul>
         {% for item in items %}
-            {{ item }} -
-            {% if (item % 3 === 0) %}Fizz{%endif%}
-            {% if (item % 5 === 0) %}Bazz{%endif%}
-            <br />
+            <li>{{ item }} {%if item%5===0||item%3===0%}-
+                    {% if (item % 3 === 0) %}<span class"fizz-buzz size-{{item%3}}">Fizz</span>{%endif%}
+                    {% if (item % 5 === 0) %}<span class'fizz-buzz size-{{item%5}}'>Buzz</span>{%endif%}
+                {%endif%}
+            </li>
         {% endfor %}
-
-    {% endfor %}
+    </ul>
 
 {% endif %}
