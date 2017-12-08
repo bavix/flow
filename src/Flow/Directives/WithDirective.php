@@ -8,22 +8,27 @@ use Bavix\Helpers\Arr;
 class WithDirective extends Directive
 {
 
+    protected static $index = 0;
     protected static $storage = [];
 
-    public static function last()
+    public static function &last()
     {
-        return current(static::$storage);
+        return static::$storage[static::$index];
     }
 
-    public static function push($data)
+    public static function push(&$data)
     {
-        Arr::push(static::$storage, $data);
-        end(static::$storage);
+        static::$storage[] = &$data;
+        static::$index = \count(static::$storage) - 1;
     }
 
     public static function pop()
     {
-        Arr::pop(static::$storage);
+        if (!empty(static::$storage))
+        {
+            Arr::pop(static::$storage);
+            static::$index--;
+        }
     }
 
     public function render(): string

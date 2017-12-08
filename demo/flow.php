@@ -6,7 +6,8 @@ $helper = new \Bavix\FlowNative\Helper();
 $native = new \Bavix\Flow\Native($helper);
 $flow  = new \Bavix\Flow\Flow($native, [
     'cache' => __DIR__ . '/cache',
-    'debug' => true
+    'debug' => true,
+//    'minify' => true
 ]);
 
 

@@ -11,6 +11,7 @@ use Bavix\Lexer\Lexer;
 use Bavix\FlowNative\FlowNative;
 use Bavix\Lexer\Token;
 use Bavix\Lexer\Validator;
+use JSMin\JSMin;
 
 class Flow
 {
@@ -93,6 +94,11 @@ class Flow
     protected $debug;
 
     /**
+     * @var bool
+     */
+    protected $minify;
+
+    /**
      * Flow constructor.
      *
      * @param Native $native
@@ -101,8 +107,9 @@ class Flow
     public function __construct(Native $native, array $options)
     {
         // configs
-        $this->debug      = $options['debug'] ?? false;
+        $this->debug         = $options['debug'] ?? false;
         $this->mapDirectives = $options['directives'] ?? [];
+        $this->minify        = $options['minify'] ?? false;
 
         // init
         $this->native     = $native;
@@ -173,9 +180,9 @@ class Flow
             {
                 $lastLast = $last;
                 $last     = $_token;
-                $code[] = ' ';
-                $code[] = $_token->token;
-                $code[] = ' ';
+                $code[]   = ' ';
+                $code[]   = $_token->token;
+                $code[]   = ' ';
                 continue;
             }
 
@@ -240,11 +247,26 @@ class Flow
         return \implode($code);
     }
 
+    protected function minify(string $view): string
+    {
+        $html = $this->compile($view);
+
+        if ($this->minify)
+        {
+            $html = \Minify_HTML::minify($html, [
+                'cssMinifier' => [\Minify_CSSmin::class, 'minify'],
+                'jsMinifier' => [JSMin::class, 'minify'],
+            ]);
+        }
+
+        return $html;
+    }
+
     public function path(string $view): string
     {
         if (!$this->fileSystem->has($view))
         {
-            $this->fileSystem->set($view, $this->compile($view));
+            $this->fileSystem->set($view, $this->minify($view));
         }
 
         return $this->fileSystem->get($view);

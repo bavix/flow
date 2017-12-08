@@ -17,5 +17,8 @@
     "psr-4": {
       "Bavix\\": "src/"
     }
+  },
+  "require-dev": {
+    "mrclay/minify": "^3.0"
   }
 }
