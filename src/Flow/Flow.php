@@ -17,8 +17,8 @@ use Psr\Cache\CacheItemPoolInterface;
 class Flow
 {
 
-    const VER_TIME = 1512632196;
-    const VERSION  = '1.0.0-alpha2';
+    const VER_TIME = 1512748526;
+    const VERSION  = '1.0.0-alpha3';
 
     /**
      * @var CacheItemPoolInterface
