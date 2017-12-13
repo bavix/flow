@@ -5,7 +5,7 @@
 
 {% literal %}{! help !}{% endliteral %}
 
-{%section hello%}{%endsection%}
+{%block hello%}{%endblock%}
 
 {% include 'foo:test2' %}
 {% partial 'foo:test' %}

@@ -1,6 +1,6 @@
 {% extends 'extends300:layout' %}
 {% set iterator = 1 %}
 
-{%section test%}!{%endsection%}
+{%block test%}!{%endblock%}
 
-{%section hello%}Hello{%endsection%}
+{%block hello%}Hello{%endblock%}

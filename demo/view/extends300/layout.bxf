@@ -2,9 +2,9 @@
     {% extends 'extends300:layout' %}
 {% else %}
 
-    <h1>{%section test prepend%}
-        {%section hello%}{%endsection%}, <span>{{ iterator }}</span>
-    {%endsection%}</h1>
+    <h1>{%block test prepend%}
+        {%block hello%}{%endblock%}, <span>{{ iterator }}</span>
+    {%endblock%}</h1>
 
     {% dump(new \stdClass) %}
 

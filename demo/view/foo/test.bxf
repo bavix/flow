@@ -1,6 +1,6 @@
 {%extends 'bar:layout'%}
 
-{%section hello%}
+{%block hello%}
     {% with user %}
         {% if !empty(.last) %}
             <h1>Hello, {{ .login}}</h1>
@@ -33,4 +33,4 @@
 
         {%endif%}
     {% endwith %}
-{%endsection%}
+{%endblock%}

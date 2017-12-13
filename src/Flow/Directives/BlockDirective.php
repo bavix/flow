@@ -5,7 +5,7 @@ namespace Bavix\Flow\Directives;
 use Bavix\Flow\Directive;
 use Bavix\FlowNative\Extensions\Blocks;
 
-class SectionDirective extends Directive
+class BlockDirective extends Directive
 {
 
     protected $extensions = [
