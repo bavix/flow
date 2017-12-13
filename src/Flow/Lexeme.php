@@ -5,7 +5,6 @@ namespace Bavix\Flow;
 use Bavix\Helpers\Arr;
 use Bavix\Lexer\Lexer;
 use Bavix\SDK\FileLoader;
-use Psr\Cache\CacheItemInterface;
 
 /**
  * Class Lexeme
@@ -18,14 +17,7 @@ class Lexeme
     /**
      * @var array
      */
-    protected $types = [
-        'callable' => '[.\w\s(,\'")]+',
-        'variable' => '[\w\'":.\[\]()\s]+',
-        'array'    => '(array\(|\[)[\s\S]*(\]|\))',
-        'ternary'  => '\X+\?\X*:\X+',
-        'bool'     => '\s*(true|false)\s*',
-        'any'      => '\X+',
-    ];
+    protected $types;
 
     /**
      * @var array
@@ -72,17 +64,13 @@ class Lexeme
     protected $flow;
 
     /**
-     * @var array
-     */
-    protected $cache = [];
-
-    /**
      * Lexeme constructor.
      *
      * @param Flow $flow
      */
     public function __construct(Flow $flow)
     {
+        $this->types = Property::get('types');
         $this->addFolder(\dirname(__DIR__, 2) . '/lexemes');
         $this->flow = $flow;
     }
@@ -152,7 +140,7 @@ class Lexeme
         {
             if (isset($prop['extends']))
             {
-                $extends = Arr::map((array)$prop['extends'], function ($extend) use ($self, $props) {
+                $extends = Arr::map((array)$prop['extends'], function ($extend) use ($self, &$props) {
                     return $self->property($props, $extend);
                 });
 
@@ -215,88 +203,33 @@ class Lexeme
 
     /**
      * @param string $key
-     *
-     * @return mixed
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    protected function getItem(string $key)
-    {
-        $name = $this->name($key);
-
-        if (empty($this->items[$name]))
-        {
-            $this->items[$name] = $this->flow->pool()->getItem($name);
-        }
-
-        return $this->items[$name];
-    }
-
-    /**
-     * @param string $key
-     * @param array  $mixed
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    protected function store(string $key, array $mixed)
-    {
-        if ($this->flow->pool())
-        {
-            $item = $this->getItem($key);
-            $item->set($mixed);
-            $this->flow->pool()->save($item);
-            $this->cache[$item->getKey()] = $mixed;
-        }
-    }
-
-    /**
-     * @param string $key
      * @param array  $syntax
      *
-     * @return void
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @return array
      */
-    protected function syntaxStore(string $key, array $syntax)
+    public function syntax2Array(string $key, array $syntax): array
     {
-        $this->store($key, [
-            'syntax' => $syntax,
-            'props'  => $this->props[$key] ?? null,
-            'closed' => $this->closed[$key] ?? false,
-        ]);
-    }
+        $props  = $this->props[$key] ?? null;
+        $closed = $this->closed[$key] ?? false;
 
-    protected function name(string $key): string
-    {
-        return \sha1($key) . Flow::VERSION;
-    }
-
-    protected function itemValue($key, $item = null)
-    {
-        if (!$item)
-        {
-            /**
-             * @var CacheItemInterface $item
-             */
-            $item = $this->getItem($key);
-        }
-
-        if ($item->isHit() && empty($this->cache[$item->getKey()]))
-        {
-            $this->cache[$item->getKey()] = $item->get();
-        }
-
-        return $this->cache[$item->getKey()] ?? null;
+        return Cache::get(__CLASS__ . $key, function () use ($syntax, $props, $closed) {
+            return [
+                'syntax' => $syntax,
+                'props'  => $props,
+                'closed' => $closed,
+            ];
+        });
     }
 
     protected function tryLoad(string $key)
     {
-        if (empty($this->data[$key]) && $this->flow->pool())
+        if (empty($this->data[$key]))
         {
-            $item = $this->itemValue($key);
+            $item = Cache::getItem(__CLASS__ . $key);
 
-            if ($item)
+            if ($item && $item->isHit())
             {
-                $_cache = $item;
+                $_cache = $item->get();
 
                 $this->data[$key]   = $_cache['syntax'];
                 $this->props[$key]  = $_cache['props'];
@@ -314,7 +247,6 @@ class Lexeme
      * @param array  $data
      *
      * @return array|mixed
-     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function getLexemes(string $key, array $data)
     {
@@ -323,7 +255,7 @@ class Lexeme
         if (empty($this->data[$key]))
         {
             $syntax = $this->syntax($key, $data);
-            $this->syntaxStore($key, $syntax);
+            $this->syntax2Array($key, $syntax);
         }
 
         return $syntax;
@@ -380,7 +312,6 @@ class Lexeme
      * @param array|null $data
      *
      * @return array|bool|mixed
-     * @throws \Psr\Cache\InvalidArgumentException
      */
     protected function get(string $key, array $data = null)
     {
@@ -447,15 +378,11 @@ class Lexeme
     public function lexerApply(string $value): array
     {
         $name = __FUNCTION__ . $value;
+        $item = Cache::getItem($name);
 
-        if ($this->flow->pool())
+        if ($item && $item->isHit())
         {
-            $item = $this->itemValue($name);
-
-            if ($item)
-            {
-                return $item;
-            }
+            return $item->get();
         }
 
         $value  = '{{ ' . $value . ' }}';
@@ -467,9 +394,9 @@ class Lexeme
             'code'  => $this->flow->build($_lexer)
         ];
 
-        $this->store($name, $store);
-
-        return $store;
+        return Cache::get($name, function () use ($store) {
+            return $store;
+        });
     }
 
     /**

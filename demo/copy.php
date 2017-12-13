@@ -12,7 +12,7 @@ $pool->setDriver(new \Stash\Driver\FileSystem([
 $flow = new \Bavix\Flow\Flow($native, [
     'compile' => __DIR__ . '/compile',
     'cache'   => $pool,
-    'debug'   => false,
+//    'debug'   => true,
 ]);
 
 $native->addFolder('copy', __DIR__ . '/view/copy');

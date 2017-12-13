@@ -5,6 +5,7 @@ namespace Bavix\Flow;
 use Bavix\Exceptions\Invalid;
 use Bavix\Exceptions\Runtime;
 use Bavix\Flow\Directives\WithDirective;
+use Bavix\Flow\Minify\HTML;
 use Bavix\FlowNative\FlowNative;
 use Bavix\Helpers\Arr;
 use Bavix\Helpers\JSON;
@@ -13,23 +14,11 @@ use Bavix\Lexer\Lexer;
 use Bavix\Lexer\Token;
 use Bavix\Lexer\Validator;
 use JSMin\JSMin;
-use Psr\Cache\CacheItemPoolInterface;
 
 class Flow
 {
 
-    const VER_TIME = 1512762401;
-    const VERSION  = '1.0.0-alpha4';
-
-    /**
-     * @var array
-     */
-    protected $cache = [];
-
-    /**
-     * @var CacheItemPoolInterface
-     */
-    protected $pool;
+    const VERSION  = '1.0.0-alpha5';
 
     /**
      * @var string
@@ -72,18 +61,9 @@ class Flow
     protected $mapDirectives = [];
 
     /**
-     * @todo подумать над списком функций
-     *
      * @var array
      */
-    protected $functions = [
-        'empty',
-        'isset',
-        'unset',
-
-        'compact',
-        'extract',
-    ];
+    protected $constructs = [];
 
     /**
      * @var array
@@ -121,9 +101,9 @@ class Flow
     protected $minify;
 
     /**
-     * @var bool
+     * @var array
      */
-    protected $inline;
+    protected $extends;
 
     /**
      * Flow constructor.
@@ -137,22 +117,19 @@ class Flow
         $this->mapDirectives = $options['directives'] ?? [];
         $this->lexemes       = $options['lexemes'] ?? [];
         $this->minify        = $options['minify'] ?? false;
-        $this->inline        = $options['inline'] ?? false;
+        $this->extends       = $options['extends'] ?? [];
         $this->debug         = $options['debug'] ?? false;
-        $this->pool          = $options['cache'] ?? null;
+
+        Cache::setPool($options['cache'] ?? null);
+
+        // props
+        $this->constructs = Property::get('constructs');
+        // /props
 
         // init
         $this->native     = $native;
         $this->fileSystem = new FileSystem($this, $options['compile']);
         $this->native->setFlow($this);
-    }
-
-    /**
-     * @return CacheItemPoolInterface
-     */
-    public function pool()
-    {
-        return $this->pool;
     }
 
     protected function loadLexemes(): self
@@ -265,39 +242,14 @@ class Flow
         );
     }
 
-    protected function store(string $name, $data)
+    public function build(array $data): string
     {
-        if ($pool = $this->pool())
-        {
-            $item = $pool->getItem($name);
-            $this->cache[$name] = $data;
-            $item->set($data);
-            $pool->save($item);
-        }
+        $self      = $this;
+        $_storeKey = __CLASS__ . JSON::encode($data);
 
-        return $data;
-    }
-
-    protected function storeName(string $key)
-    {
-        return $key . self::VERSION;
-    }
-
-    protected function storeItem(string $name)
-    {
-        $pool = $this->pool();
-
-        if ($pool && empty($this->cache[$name]))
-        {
-            $item = $pool->getItem($name);
-
-            if ($item->isHit())
-            {
-                $this->cache[$name] = $item->get();
-            }
-        }
-
-        return $this->cache[$name] ?? null;
+        return Cache::get($_storeKey, function () use ($self, &$data) {
+            return $self->buildWithoutCache($data);
+        });
     }
 
     /**
@@ -305,16 +257,8 @@ class Flow
      *
      * @return string
      */
-    public function build(array $data): string
+    public function buildWithoutCache(array $data): string
     {
-        $_storeKey = JSON::encode($data);
-        $storeItem = $this->storeItem($_storeKey);
-
-        if ($storeItem)
-        {
-            return $storeItem;
-        }
-
         $code     = [];
         $lastLast = null;
         $last     = null;
@@ -340,11 +284,11 @@ class Flow
 
                 if (!Arr::in([T_NEW, T_CLASS], $_token->type))
                 {
-                    $code[]   = ' ';
+                    $code[] = ' ';
                 }
 
-                $code[]   = $_token->token;
-                $code[]   = ' ';
+                $code[] = $_token->token;
+                $code[] = ' ';
                 continue;
             }
 
@@ -367,7 +311,7 @@ class Flow
             if ((!$last || ($last && $last->type !== Validator::T_DOT)) && $_token->type === T_FUNCTION)
             {
                 if (Str::ucFirst($_token->token) !== $_token->token &&
-                    !Arr::in($this->functions, $_token->token))
+                    !Arr::in($this->constructs, $_token->token))
                 {
                     $_token->token = '$this->' . $_token->token;
                 }
@@ -413,7 +357,7 @@ class Flow
             $code[]   = $_token->token;
         }
 
-        return $this->store($_storeKey, \implode($code));
+        return \implode($code);
     }
 
     /**
@@ -433,9 +377,10 @@ class Flow
             ]);
         }
 
-        if ($this->inline)
+        if (!empty($this->extends))
         {
-            $html = \preg_replace("~[ \t\n\r\x0B]+~u", ' ', $html);
+            $html = (new HTML($html, $this->extends))
+                ->apply();
         }
 
         return $html;
@@ -517,7 +462,14 @@ class Flow
         return Arr::pop($this->directives[$key]);
     }
 
-    protected function replace(string $fragment, string $code, string $tpl = null)
+    /**
+     * @param string      $fragment
+     * @param string      $code
+     * @param string|null $tpl
+     *
+     * @return string
+     */
+    protected function replace(string $fragment, string $code, string $tpl = null): string
     {
         if (!$tpl)
         {

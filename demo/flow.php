@@ -13,6 +13,10 @@ $flow   = new \Bavix\Flow\Flow($native, [
     'cache'      => $pool,
     'debug'      => true,
     'minify'     => true,
+    'extends' => [
+        \Bavix\Flow\Minify\Extensions\RemoveComments::class,
+        \Bavix\Flow\Minify\Extensions\CollapseWhitespace::class
+    ],
     'lexemes'    => [
         __DIR__ . '/lexemes',
     ],

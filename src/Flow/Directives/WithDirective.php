@@ -13,7 +13,7 @@ class WithDirective extends Directive
 
     protected static function calc()
     {
-        static::$index     = \count(static::$storage) - 1;
+        static::$index = \count(static::$storage) - 1;
     }
 
     public static function &last()
@@ -24,13 +24,13 @@ class WithDirective extends Directive
     public static function pushObject($data)
     {
         static::$storage[] = $data;
-        static::$index     = \count(static::$storage) - 1;
+        static::calc();
     }
 
     public static function push(&$data)
     {
         static::$storage[] = &$data;
-        static::$index     = \count(static::$storage) - 1;
+        static::calc();
     }
 
     public static function pop()
