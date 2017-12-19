@@ -73,6 +73,11 @@ class Flow
     /**
      * @var array
      */
+    protected $folders = [];
+
+    /**
+     * @var array
+     */
     protected $rows;
 
     /**
@@ -120,6 +125,7 @@ class Flow
     {
         // configs
         $this->mapDirectives = $options['directives'] ?? [];
+        $this->folders       = $options['folders'] ?? [];
         $this->lexemes       = $options['lexemes'] ?? [];
         $this->minify        = $options['minify'] ?? false;
         $this->extends       = $options['extends'] ?? [];
@@ -234,6 +240,10 @@ class Flow
         {
             $this->native = $native;
             $this->native->setFlow($this);
+
+            foreach ($this->folders as $folder => $path) {
+                $this->native->addFolder($folder, $path);
+            }
         }
     }
 
