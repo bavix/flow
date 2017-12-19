@@ -1,15 +1,17 @@
 # flow
 
-## syntax
 
-### set variable
+
+Syntax
+
+## set variable
 Installation of variables.
 
 ```php
 {% set begin = -10 %}
 ```
 
-### Dump
+## Dump
 Dumps information about a variable.
 
 ```php
@@ -17,7 +19,7 @@ Dumps information about a variable.
 {% dump(user, profile) %}
 ```
 
-### for / foreach 
+## for / foreach 
 Cycles.
 
 ```php
@@ -45,7 +47,17 @@ In a cycle there is a loop variable.
 {% endfor %}
 ```
 
-### literal
+## forelse
+
+```php
+{% for item in items %}
+    {% dump(loop) %}
+{% forelse %}
+    <p>Items is empty</p>
+{% endfor %}
+```
+
+## literal
 Everything that in the literal tag isn't processed.
 
 ```php
