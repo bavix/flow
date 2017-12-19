@@ -6,7 +6,6 @@ use Bavix\Exceptions\Invalid;
 use Bavix\Exceptions\Runtime;
 use Bavix\Flow\Directives\WithDirective;
 use Bavix\Flow\Minify\HTML;
-use Bavix\FlowNative\FlowNative;
 use Bavix\Helpers\Arr;
 use Bavix\Helpers\JSON;
 use Bavix\Helpers\Str;
@@ -18,7 +17,7 @@ use JSMin\JSMin;
 class Flow
 {
 
-    const VERSION = '1.0.0-alpha5';
+    const VERSION = '1.0.0';
 
     /**
      * @var string
