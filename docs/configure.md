@@ -27,7 +27,7 @@ new \Bavix\Flow\Flow($native, [
 ```
 
 #### debug mode
-___:warning: Slows down work of a shablonizator in tens of times. 
+:warning: Slows down work of a shablonizator in tens of times. 
 Use only when developing the project.
 
 ```php
