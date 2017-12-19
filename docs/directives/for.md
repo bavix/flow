@@ -10,6 +10,12 @@ Loops.
 ```
 
 ```php
+{% for (key, item) in items %}
+    // todo
+{% endfor %}
+```
+
+```php
 {% for items as item %}
     // todo
 {% endfor %}
