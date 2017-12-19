@@ -23,7 +23,7 @@ class Flow
     /**
      * @var string
      */
-    protected $ext = 'bxf';
+    protected $ext;
 
     /**
      * @var Lexer
@@ -130,6 +130,7 @@ class Flow
         $this->minify        = $options['minify'] ?? false;
         $this->extends       = $options['extends'] ?? [];
         $this->debug         = $options['debug'] ?? false;
+        $this->ext           = $options['ext'] ?? 'bxf';
 
         Cache::setPool($options['cache'] ?? null);
 
@@ -241,7 +242,8 @@ class Flow
             $this->native = $native;
             $this->native->setFlow($this);
 
-            foreach ($this->folders as $folder => $path) {
+            foreach ($this->folders as $folder => $path)
+            {
                 $this->native->addFolder($folder, $path);
             }
         }
