@@ -18,7 +18,7 @@ use JSMin\JSMin;
 class Flow
 {
 
-    const VERSION  = '1.0.0-alpha5';
+    const VERSION = '1.0.0-alpha5';
 
     /**
      * @var string
@@ -76,7 +76,7 @@ class Flow
     protected $rows;
 
     /**
-     * @var FlowNative
+     * @var Native
      */
     protected $native;
 
@@ -106,12 +106,17 @@ class Flow
     protected $extends;
 
     /**
+     * @var string
+     */
+    protected $pathCompile;
+
+    /**
      * Flow constructor.
      *
      * @param Native $native
      * @param array  $options
      */
-    public function __construct(Native $native, array $options)
+    public function __construct(Native $native = null, array $options = [])
     {
         // configs
         $this->mapDirectives = $options['directives'] ?? [];
@@ -126,10 +131,9 @@ class Flow
         $this->constructs = Property::get('constructs');
         // /props
 
-        // init
-        $this->native     = $native;
-        $this->fileSystem = new FileSystem($this, $options['compile']);
-        $this->native->setFlow($this);
+        $this->pathCompile = $options['compile'] ?? sys_get_temp_dir();
+
+        $this->setNative($native);
     }
 
     protected function loadLexemes(): self
@@ -205,6 +209,14 @@ class Flow
      */
     public function fileSystem(): FileSystem
     {
+        if (!$this->fileSystem)
+        {
+            $this->fileSystem = new FileSystem(
+                $this,
+                $this->pathCompile
+            );
+        }
+
         return $this->fileSystem;
     }
 
@@ -216,11 +228,25 @@ class Flow
         return '.' . $this->ext;
     }
 
-    /**
-     * @return FlowNative
-     */
-    public function native(): FlowNative
+    protected function setNative($native)
     {
+        if ($native)
+        {
+            $this->native = $native;
+            $this->native->setFlow($this);
+        }
+    }
+
+    /**
+     * @return Native
+     */
+    public function native(): Native
+    {
+        if (!$this->native)
+        {
+            $this->setNative(new Native());
+        }
+
         return $this->native;
     }
 
@@ -393,12 +419,12 @@ class Flow
      */
     public function path(string $view): string
     {
-        if (!$this->fileSystem->has($view))
+        if (!$this->fileSystem()->has($view))
         {
-            $this->fileSystem->set($view, $this->minify($view));
+            $this->fileSystem()->set($view, $this->minify($view));
         }
 
-        return $this->fileSystem->get($view);
+        return $this->fileSystem()->get($view);
     }
 
     /**
@@ -567,7 +593,7 @@ class Flow
      */
     public function compile(string $view): string
     {
-        $path      = $this->native->path($view . $this->ext());
+        $path      = $this->native()->path($view . $this->ext());
         $this->tpl = \file_get_contents($path);
         $tokens    = $this->lexer()->tokens($this->tpl);
 

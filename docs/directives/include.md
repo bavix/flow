@@ -1,0 +1,6 @@
+Directive {% include %}
+==================
+
+Directive {% partial %}
+==================
+

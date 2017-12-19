@@ -1,65 +1,13 @@
 # flow
 
+Flow - lightweight template engine for PHP.
 
+[[Get Started](./docs/get-started.md)]
+[[Documentation](./docs/readme.md)]
 
-Syntax
-
-## set variable
-Installation of variables.
-
-```php
-{% set begin = -10 %}
-```
-
-## Dump
-Dumps information about a variable.
-
-```php
-{% dump(variable) %}
-{% dump(user, profile) %}
-```
-
-## for / foreach 
-Cycles.
-
-```php
-{% for item in items %}
-    // todo
-{% endfor %}
-```
-
-```php
-{% for items as item %}
-    // todo
-{% endfor %}
-```
-
-```php
-{% for items as key => item %}
-    // todo
-{% endfor %}
-```
-
-In a cycle there is a loop variable.
-```php
-{% for item in items %}
-    {% dump(loop) %}
-{% endfor %}
-```
-
-## forelse
-
-```php
-{% for item in items %}
-    {% dump(loop) %}
-{% forelse %}
-    <p>Items is empty</p>
-{% endfor %}
-```
-
-## literal
-Everything that in the literal tag isn't processed.
-
-```php
-{% literal %}{! html !}{% endliteral %}
-```
+* **Vendor**: bavix
+* **Package**: Flow  
+* **Version**: 1.0.0-alpha5
+* **PHP Version**: 7.0+ 
+* **PHP Extensions**: `tokenizer`
+* **[Composer](https://getcomposer.org/):** `composer require bavix/flow`
