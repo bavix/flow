@@ -1,7 +1,7 @@
 Directive {% for %}
 =====================
  
-Cycles.
+Loops.
 
 ```php
 {% for item in items %}
@@ -21,7 +21,7 @@ Cycles.
 {% endfor %}
 ```
 
-In a cycle there is a loop variable.
+In a for there is a loop variable.
 ```php
 {% for item in items %}
     {% dump(loop) %}
