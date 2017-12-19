@@ -11,7 +11,7 @@ Syntax
 
 | Type | Example |
 | :--- | :--- |
-| callable | `{{ substr(hello, 0, 1) }}` |
+| callable | `{{ substring(hello, 0, 1) }}` |
 | variable | `{{ hello }}` |
 | number | `{{ 9501 }}`, `{{ 9501.03 }}` |
 | string | `{{ 'hello' }}`, `{{ 'hello' ~ ' ' ~ 'world' }}` |
