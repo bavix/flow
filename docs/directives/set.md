@@ -1,5 +1,6 @@
+Directive {% set %}
+==================
 
-## set variable
 Installation of variables.
 
 ```php

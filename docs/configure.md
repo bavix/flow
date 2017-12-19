@@ -1,6 +1,9 @@
 Configuration
 =============
 
+[[Get Started](./get-started.md)]
+[[Documentation](./readme.md)]
+
 #### compile
 Here you specify the folder for compilation of a template.
 

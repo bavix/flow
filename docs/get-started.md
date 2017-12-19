@@ -1,6 +1,9 @@
 Get Started
 ===========
 
+[[Documentation](./readme.md)]
+[[Configuration](./configure.md)]
+
 ### Installation
 
 The recommended way to install Flow is via Composer:
