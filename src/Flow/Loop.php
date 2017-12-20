@@ -34,7 +34,9 @@ class Loop
         if (!empty($data))
         {
             $this->firstIndex = \key($data);
+            $this->key        = $this->firstIndex;
             \end($data);
+
             $this->lastIndex = \key($data);
             \reset($data);
         }

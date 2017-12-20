@@ -15,12 +15,18 @@
     "bavix/lexer": "^1.0",
     "psr/cache": "^1.0"
   },
+  "require-dev": {
+    "tedivm/stash": "^0.14.2",
+    "bavix/tests": "^1.0"
+  },
   "autoload": {
     "psr-4": {
       "Bavix\\": "src/"
     }
   },
-  "require-dev": {
-    "tedivm/stash": "^0.14.2"
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
   }
 }
