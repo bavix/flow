@@ -3,7 +3,7 @@ Configuration
 
 [[Get Started](./get-started.md)]
 [[Documentation](./readme.md)]
-[Configure]
+[Configuration]
 
 #### compile
 Here you specify the folder for compilation of a template.
