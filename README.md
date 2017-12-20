@@ -7,8 +7,9 @@
 
 Flow - lightweight template engine for PHP.
 
-[[Get Started](./docs/get-started.md)]
-[[Documentation](./docs/readme.md)]
+[[Get Started](./get-started.md)]
+[[Documentation](./readme.md)]
+[[Configuration](./configure.md)]
 
 * **Vendor**: bavix
 * **Package**: Flow  

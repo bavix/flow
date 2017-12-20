@@ -1,6 +1,7 @@
 Get Started
 ===========
 
+[Get Started]
 [[Documentation](./readme.md)]
 [[Configuration](./configure.md)]
 

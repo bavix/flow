@@ -2,6 +2,7 @@ Documentation
 =============
 
 [[Get Started](./get-started.md)]
+[Documentation]
 [[Configuration](./configure.md)]
 
 Syntax
