@@ -22,4 +22,13 @@ syntax:
   - '\({{ key }}, {{ row }}\) in {{ rows }}'
 
 directives:
+
+  continue:
+    syntax:
+      - '({{ num }})?'
+
+  break:
+    syntax:
+      - '({{ num }})?'
+
   forelse:

@@ -8,6 +8,9 @@
 
             {% for image in .['images']() %}
 
+                {% if loop.first %} <h1>continue</h1> {% continue %} {% endif %}
+                {% if loop.last %} <h1>break</h1> {% break %} {% endif %}
+
                 {% dump(loop, image) %}
 
                 {% with image %}

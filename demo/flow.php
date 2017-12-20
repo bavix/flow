@@ -74,6 +74,8 @@ $args = [
         'images' => function () {
             return [
                 new Image('http://via.placeholder.com/350x150'),
+                new Image('http://via.placeholder.com/350x150'),
+                new Image('http://via.placeholder.com/350x150'),
                 new Image('http://via.placeholder.com/350x150')
             ];
         },
