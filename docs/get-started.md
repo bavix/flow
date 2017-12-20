@@ -16,8 +16,11 @@ composer require "bavix/flow"
 This section gives you a brief introduction to the PHP API for Flow.
 
 ```php
-$flow = new \Bavix\Flow\Flow();
-$flow->native()->addFolder('app', __DIR__ . '/view');
+$flow = new \Bavix\Flow\Flow([
+    'folders' => [
+        'app' => __DIR__ . '/view'
+    ]
+]);
 
 echo $flow->render('app:layer', ['name' => 'Bavix']);
 ```
