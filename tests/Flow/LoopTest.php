@@ -44,4 +44,44 @@ class LoopTest extends Unit
         );
     }
 
+    public function testNext()
+    {
+        for ($i = 0; $i < \count($this->data) - 1; ++$i)
+        {
+            $this->loop->next(\key($this->data));
+            next($this->data);
+
+            $this->assertSame(
+                $this->loop->index,
+                $i
+            );
+
+            $this->assertSame(
+                $this->loop->iteration,
+                $i + 1
+            );
+        }
+    }
+
+    /**
+     * @expectedException \Bavix\Exceptions\Invalid
+     */
+    public function testInvalid()
+    {
+        $this->loop->dada = 12;
+    }
+
+    public function testExists()
+    {
+        $this->assertTrue(
+            isset($this->loop->firstIndex)
+        );
+
+        $this->assertFalse(
+            isset($this->loop->nonoonono)
+        );
+    }
+
+
+
 }

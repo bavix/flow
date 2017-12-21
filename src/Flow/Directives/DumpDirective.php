@@ -9,7 +9,7 @@ class DumpDirective extends Directive
 
     public function render(): string
     {
-        if (class_exists(\Symfony\Component\VarDumper\VarDumper::class))
+        if (PHP_SAPI !== 'cli' && class_exists(\Symfony\Component\VarDumper\VarDumper::class))
         {
             return '<?php \Symfony\Component\VarDumper\VarDumper::dump(' . $this->data['args']['code'] . '); ?>';
         }
