@@ -13,7 +13,7 @@ class CollapseWhitespace extends Extension
     public function patterns(): array
     {
         return [
-            '\n+([\S]*)'         => '$1',
+            '\n+([\S]*)'        => ' $1',
             '\r'                => '',
             '[\s\t\n\r\0\x0B]+' => ' ',
         ];
