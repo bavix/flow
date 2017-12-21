@@ -16,6 +16,7 @@
     "psr/cache": "^1.0"
   },
   "require-dev": {
+    "symfony/var-dumper": "^4.0",
     "tedivm/stash": "^0.14.2",
     "bavix/tests": "^1.0"
   },
