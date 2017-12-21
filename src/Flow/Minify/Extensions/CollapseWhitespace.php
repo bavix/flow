@@ -15,7 +15,7 @@ class CollapseWhitespace extends Extension
         return [
             '\n+([\S]*)'         => '$1',
             '\r'                => '',
-            "[\s\t\n\r\0\x0B]+" => ' ',
+            '[\s\t\n\r\0\x0B]+' => ' ',
         ];
     }
 
