@@ -27,7 +27,7 @@ abstract class Extension
      */
     protected function pattern(string $replace): string
     {
-        return '~' . \preg_quote($replace, '~') . '~ui';
+        return '~' . \str_replace('~', '\\~', $replace) . '~ui';
     }
 
     /**
