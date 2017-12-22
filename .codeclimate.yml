@@ -1,0 +1,12 @@
+engines:
+  sonar-php:
+    enabled: true
+    config:
+      tests_patterns:
+        - tests/**
+exclude_paths:
+  - build/
+  - config/
+  - demo/
+  - docs/
+  - lexemes/
