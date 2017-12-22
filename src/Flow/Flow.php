@@ -17,7 +17,7 @@ use JSMin\JSMin;
 class Flow
 {
 
-    const VERSION = '1.0.4';
+    const VERSION = '1.0.6';
 
     /**
      * @var string
