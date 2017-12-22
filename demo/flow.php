@@ -10,13 +10,13 @@ $pool->setDriver(new \Stash\Driver\FileSystem([
 $native = new \Bavix\Flow\Native();
 $flow   = new \Bavix\Flow\Flow($native, [
     'compile'    => __DIR__ . '/compile',
-    'cache'      => $pool,
+//    'cache'      => $pool,
     'debug'      => true,
-    'minify'     => true,
-    'extends' => [
-        \Bavix\Flow\Minify\Extensions\RemoveComments::class,
-        \Bavix\Flow\Minify\Extensions\CollapseWhitespace::class
-    ],
+//    'minify'     => true,
+//    'extends' => [
+//        \Bavix\Flow\Minify\Extensions\RemoveComments::class,
+//        \Bavix\Flow\Minify\Extensions\CollapseWhitespace::class
+//    ],
     'lexemes'    => [
         __DIR__ . '/lexemes',
     ],

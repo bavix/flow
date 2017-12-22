@@ -114,6 +114,15 @@ class Lexeme
                 try
                 {
                     return FileLoader::load($folder . '/' . $file . '.' . $ext);
+//                    $data = FileLoader::load($folder . '/' . $file . '.' . $ext);
+//
+//                    if ($ext === 'yml')
+//                    {
+//                        (new FileLoader\PHPLoader($folder . '/' . $file . '.php' ))
+//                            ->save($data->asArray());
+//                    }
+//
+//                    return $data;
                 }
                 catch (\Throwable $throwable)
                 {

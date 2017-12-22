@@ -1,6 +1,6 @@
 {% ll(menu) %}
 
-{{ help}}
+{{ substring(help, 0) }}
 {! help !}
 
 {% literal %}{! help !}{% endliteral %}

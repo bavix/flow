@@ -77,7 +77,7 @@ class FileSystem
      */
     public function get(string $view): string
     {
-        return $this->path . '/' . preg_replace('~\W~', '/', $view) . '.php';
+        return $this->path . '/' . \preg_replace('~\W~', '/', $view) . '.php';
     }
 
 }

@@ -22,9 +22,7 @@ class Native extends FlowNative
 
     public function render($view, array $arguments = [])
     {
-        $this->content->mergeData([
-            'flow' => $this->flow
-        ]);
+        $this->content()->flow = $this->flow;
 
         return parent::render($view, $arguments);
     }

@@ -350,7 +350,7 @@ class Flow
                 if (Str::ucFirst($_token->token) !== $_token->token &&
                     !Arr::in($this->constructs, $_token->token))
                 {
-                    $_token->token = '$this->' . $_token->token;
+                    $_token->token = '$this->helper->' . $_token->token;
                 }
             }
 
