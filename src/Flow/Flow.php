@@ -345,7 +345,9 @@ class Flow
                 $_token->token = '.';
             }
 
-            if ((!$last || ($last && $last->type !== Validator::T_DOT)) && $_token->type === T_FUNCTION)
+            if ((!$last ||
+                ($last && !Arr::in([\T_DOUBLE_COLON, Validator::T_DOT], $last->type))) &&
+                $_token->type === T_FUNCTION)
             {
                 if (Str::ucFirst($_token->token) !== $_token->token &&
                     !Arr::in($this->constructs, $_token->token))
@@ -382,7 +384,8 @@ class Flow
                             Validator::T_ENDBRACKET,
                             Validator::T_ENDARRAY,
                             Validator::T_DOT,
-                            T_NS_SEPARATOR
+                            T_NS_SEPARATOR,
+                            \T_DOUBLE_COLON
                         ], $last->type)))
                 {
                     $_token->token = '$this->' . $_token->token;
