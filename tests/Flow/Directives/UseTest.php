@@ -7,7 +7,7 @@ use Tests\Unit;
 class UseTest extends Unit
 {
 
-    public function testSet()
+    public function testUse()
     {
         $hello = 'PHP: Hello World';
 
