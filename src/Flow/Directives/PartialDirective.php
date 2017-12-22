@@ -10,8 +10,7 @@ class PartialDirective extends Directive
     public function render(): string
     {
         return '<?php echo \file_get_contents($this->native->path(' .
-            $this->data['path']['code'] .
-            '.\'' . $this->flow->ext() . '\'))?>';
+            $this->data['path']['code'] . '))?>';
     }
 
 }

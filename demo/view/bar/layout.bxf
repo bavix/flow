@@ -8,4 +8,4 @@
 {%block hello%}{%endblock%}
 
 {% include 'foo:test2' %}
-{% partial 'foo:test' %}
+{% partial 'foo:test.bxf' %}

@@ -46,6 +46,8 @@ abstract class Directive
     }
 
     /**
+     * @codeCoverageIgnore
+     *
      * @return string
      */
     public function endDirective(): string
