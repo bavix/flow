@@ -1,5 +1,6 @@
 # flow
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/feea95c29c49cef36a4d/maintainability)](https://codeclimate.com/github/bavix/flow/maintainability)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bavix/flow/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bavix/flow/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/bavix/flow/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bavix/flow/?branch=master)
 [![Build Status](https://scrutinizer-ci.com/g/bavix/flow/badges/build.png?b=master)](https://scrutinizer-ci.com/g/bavix/flow/build-status/master)
