@@ -45,7 +45,7 @@ Syntax
 * [ucFirst](https://php.net/manual/en/function.ucfirst.php) - Make a string's first character uppercase.
 * [lcFirst](https://php.net/manual/en/function.lcfirst.php) -  Make a string's first character lowercase.
 * random - Return of a random string.
-* [uniqid](https://php.net/manual/en/function.uniqid.php) - Generate a unique ID
+* [uniqid](https://php.net/manual/en/function.uniqid.php) - Generate a unique ID.
 * fileSize
 * translit
 * first
@@ -68,8 +68,8 @@ Syntax
 
 #### Work with number type
 
-* randomInt
-* format
+* [randomInt](https://secure.php.net/manual/en/function.random-int.php) — Generates cryptographically secure pseudo-random integers.
+* [format](https://secure.php.net/manual/en/function.number-format.php) — Format a number with grouped thousands.
 
 #### Work with json type
 
