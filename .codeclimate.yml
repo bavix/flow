@@ -2,8 +2,22 @@ version: 2
 
 plugins:
 
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - php
+
   phpcodesniffer:
     enabled: true
+
+  phpmd:
+    enabled: true
+    checks:
+      CleanCode/ElseExpression:
+        enabled: false
+      Controversial/Superglobals:
+        enabled: false
 
   sonar-php:
     enabled: true
