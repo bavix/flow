@@ -1,15 +1,17 @@
+version: 2
+
 plugins:
+
   phpcodesniffer:
     enabled: true
 
-engines:
   sonar-php:
     enabled: true
     config:
       tests_patterns:
         - tests/**
 
-exclude_paths:
+exclude_patterns:
   - build/
   - config/
   - demo/
