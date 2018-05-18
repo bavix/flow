@@ -24,3 +24,8 @@ Flow - lightweight template engine for PHP.
 * **PHP Version**: 7.1+ 
 * **PHP Extensions**: `tokenizer`
 * **[Composer](https://getcomposer.org/):** `composer require bavix/flow`
+
+---
+Supported by
+
+[![Supported by JetBrains](https://cdn.rawgit.com/bavix/development-through/46475b4b/jetbrains.svg)](https://www.jetbrains.com/)
