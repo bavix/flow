@@ -16,7 +16,7 @@
   },
   "require-dev": {
     "symfony/var-dumper": "^5.0",
-    "tedivm/stash": "^0.16.0",
+    "tedivm/stash": "^0.17.2",
     "symfony/yaml": "^5.0",
     "bavix/tests": "^1.0"
   },
